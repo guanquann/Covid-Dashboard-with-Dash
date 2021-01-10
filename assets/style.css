@@ -1,0 +1,41 @@
+body {
+    margin: 0;
+}
+
+.title {
+    text-align: center;
+    font-size: 5vh;
+    color: #F4E808;
+}
+
+.daily_stats_thumbnail {
+    border-radius: 5px;
+    text-align: center;
+    width: 19%;
+    font-size: 1.7vw;
+    display: inline-block;
+    margin-right: 4%;
+    background-color: #F4E808;   /* #F5765B  --orange */
+}
+
+.daily_stats_thumbnail_display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.daily_stats_thumbnail_inner_div {
+    background-color: white;
+    margin: 2%;
+    border-radius: 3px;
+    font-size: 2vw;
+}
+
+.newspaper_thumbnail {
+    border: 2px black solid;
+    text-align: left;
+    display: inline-block;
+    font-size: 15px;
+    padding: 1px;
+    width: 300px;
+}
