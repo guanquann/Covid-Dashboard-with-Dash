@@ -2,15 +2,11 @@ import dash
 import dash_table
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
-import dash_html_components as html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import plotly.graph_objects as go
 import plotly.express as px
-import pandas as pd
-import json
-import requests
-import time
-import datetime as datetime
+
+from get_data import *
 
 app = dash.Dash(__name__, title='Covid-19 Analytics',
                 external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css'],
@@ -21,47 +17,18 @@ colors = {
     'text': '#F4E808'
 }
 
-df = pd.read_csv(r'C:\Users\Acer\PycharmProjects\temp\owid-covid-data.csv')
 # df = pd.read_csv(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
-
-# Identify rows that have new cases less than 0, which is impossible
-df[df['new_cases'] < 0] = 0
-
-# Get just the relevant columns
-df = df[["iso_code", "continent", "location", "date", "total_cases", "new_cases", "total_deaths", "new_deaths",
-         "total_cases_per_million", "new_cases_per_million", "total_deaths_per_million", "new_deaths_per_million", "population"]]
-
-# Continent that are N.A. means total world statistics
-df = df[df['continent'].notna()]
-
-# Remove rows that are wrong value / empty
-df = df[df['date'].notna()]
-df = df[df['date'] != 0]
-df = df[df['total_cases'].notna()]
-df = df.round(2)
-
-# Replace all N.A. with 0 for easy manipulation of data
-df.fillna(0, inplace=True)
-# df.to_csv('covid-data.csv')
-
-# Convert column from string to date object
-df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
-group_continent = pd.read_csv('covid-data.csv')
-
-country_name_list = []
-for country_name in df['location'].unique():
-    country_name_list.append({'label': country_name, 'value': country_name})
-
-# transform every unique date to a number
-numdate = [x for x in range(0, len(df['date'].unique()) + 30, 30)]
+df, country_name_list, numdate = latest_covid_data(r'C:\Users\Acer\PycharmProjects\temp\owid-covid-data.csv')
 
 
 ############################################################################################
 # @app.callback(
-#     Output("loading-output", "children"), [Input(component_id='total_by_continent', component_property='figure'),
-#     Input(component_id='daily_by_continent', component_property='figure')]
+#     Output("loading-output", "children"),
+#     Input("graph", "figure"),
+#     # [Input(component_id='total_by_continent', component_property='figure'),
+#     # Input(component_id='daily_by_continent', component_property='figure')]
 # )
-# def load_output(n, i):
+# def load_output(n):
 #     if n:
 #         time.sleep(1)
 #         return f"Output loaded {datetime.datetime.now()} times"
@@ -70,38 +37,7 @@ numdate = [x for x in range(0, len(df['date'].unique()) + 30, 30)]
 ############################################################################################
 
 
-def generate_thumbnail(news_title, news_description, news_url, news_image_url):
-    return html.Div([
-        html.Img(src=news_image_url,
-                 style={"width": "100%"}),
-        html.A(news_title, href=news_url, target='_blank'),
-    ], className="newspaper_thumbnail")
-
-
-all_news = []
-url = ('http://newsapi.org/v2/everything?'
-       'language=en&'
-       'q=covid-19&'
-       'from=2020-12-31&'
-       'sources=bbc-news&'
-       'sortBy=popularity&'
-       'apiKey=bf25476268b640d0a6972e685f1c7215')
-
-response = requests.get(url)
-
-for news in response.json()['articles']:
-    if 'covid' in news['description'].lower() or 'coronavirus' in news['description'].lower() or 'pandemic' in news[
-        'description'].lower() \
-            or 'coronavirus' in news['title'].lower() or 'covid' in news['title'].lower():
-        all_news.append(generate_thumbnail(news['title'], news['description'], news['url'], news['urlToImage']))
-
 df_cols = ['Country', 'Total Cases', 'New Cases', 'Total Deaths', 'New Deaths']
-
-items = [
-    dbc.DropdownMenuItem("Item 1"),
-    dbc.DropdownMenuItem("Item 2"),
-    dbc.DropdownMenuItem("Item 3"),
-]
 
 app.layout = html.Div(style={'backgroundColor': colors['bg']}, children=[
 
@@ -111,6 +47,8 @@ app.layout = html.Div(style={'backgroundColor': colors['bg']}, children=[
     #         dbc.Spinner(html.Div(id="loading-output"), fullscreen=True, color="primary"),
     #     ]
     # ),
+
+    html.Div(id="output_div", style={"background-color": "white", "margin": "10px"}),
 
     html.H1('Coronavirus Disease (COVID-19) Dashboard', className="title"),
 
@@ -136,7 +74,7 @@ app.layout = html.Div(style={'backgroundColor': colors['bg']}, children=[
         html.Div(id='total_deaths', className="daily_stats_thumbnail"),
     ], className="daily_stats_thumbnail_display"),
 
-    dcc.Graph(id='graph', figure={}, style={"margin": "3%", "color": "#F4E808"}),  # "border": "2px black solid",
+    dcc.Graph(id='graph', figure={}, style={"margin": "3%", "color": "#F4E808"}),
 
     dcc.Dropdown(
         id='deaths_or_cases',
@@ -147,7 +85,7 @@ app.layout = html.Div(style={'backgroundColor': colors['bg']}, children=[
         value='Cases',
         style={'width': '40%', 'display': 'inline-block', "margin-left": "3%"},
     ),
-    # dbc.DropdownMenu([dbc.DropdownMenuItem("Cases"), dbc.DropdownMenuItem("Deaths")], label="Cases", color="primary"),
+
     # dcc.Graph(id='total_by_continent', figure={}, style={"margin": "3%"}),
 
     # dcc.Graph(id='daily_by_continent', figure={}, style={"margin": "3%", "border-radius": "5px"}),
@@ -155,9 +93,10 @@ app.layout = html.Div(style={'backgroundColor': colors['bg']}, children=[
     html.Div([dash_table.DataTable(
         id="table_stats",
         columns=[{"name": col, "id": ['location', 'total_cases', 'new_cases', 'total_deaths', 'new_deaths',
-                                      "population", "total_cases_per_million", "total_deaths_per_million"][idx]}
+                                      "population", "total_vaccinations", "total_cases_per_million",
+                                      "total_deaths_per_million"][idx]}
                  for (idx, col) in enumerate(['Country', 'Confirmed', '\u21E7 Cases', 'Deaths', '\u21E7 Deaths',
-                                              "Population", "Confirm/1M", "Deaths/1M"])],
+                                              "Population", "Vaccination", "Confirm/1M", "Deaths/1M"])],
         # page_action='none',
         fixed_rows={'headers': True},
         style_table={'height': '300px', 'overflowY': 'auto'},
@@ -175,7 +114,7 @@ app.layout = html.Div(style={'backgroundColor': colors['bg']}, children=[
             'color': '#F4E808',
             'fontSize': '15px',
             'textAlign': 'left',
-            'width': '8%',
+            'width': '7%',
         },
         # Remove vertical lines
         style_as_list_view=True,
@@ -196,17 +135,17 @@ app.layout = html.Div(style={'backgroundColor': colors['bg']}, children=[
         #     value='Total',
         #     style={'width': '300px', 'display': 'inline-block'},
         # )]),
-    html.Div([
-        dcc.Graph(id='total_cases_by_country', figure={}), dcc.Graph(id='daily_cases_by_country', figure={}),
-        dcc.Graph(id='total_deaths_by_country', figure={}), dcc.Graph(id='daily_deaths_by_country', figure={})],
-        style={'display': 'flex'}),
+        html.Div([
+            dcc.Graph(id='total_cases_by_country', figure={}), dcc.Graph(id='daily_cases_by_country', figure={}),
+            dcc.Graph(id='total_deaths_by_country', figure={}), dcc.Graph(id='daily_deaths_by_country', figure={})],
+            style={'display': 'flex'}),
 
-    html.Div(id='news_location'),
-    html.Button('<', id='previous_news', n_clicks=0),
-    html.Button('>', id='next_news', n_clicks=0),
-    html.Div(id='container-button-basic',
-             children='Enter a value and press submit')
-])])
+        html.Div(id='news_location'),
+        html.Button('<', id='previous_news', n_clicks=0),
+        html.Button('>', id='next_news', n_clicks=0),
+        html.Div(id='container-button-basic',
+                 children='Enter a value and press submit')
+    ])])
 
 
 @app.callback(
@@ -227,13 +166,13 @@ def table_data(date_selected):
 )
 def stats(date_selected):
     new_cases = "NEW CASES", html.Br(), html.Div([df['new_cases'][df['date'] == date_selected].sum()],
-                                                    className="daily_stats_thumbnail_inner_div")
+                                                 className="daily_stats_thumbnail_inner_div")
     new_deaths = "NEW DEATHS", html.Br(), html.Div([df['new_deaths'][df['date'] == date_selected].sum()],
                                                    className="daily_stats_thumbnail_inner_div")
     total_cases = "TOTAL CASES", html.Br(), html.Div([df['new_cases'][df['date'] <= date_selected].sum()],
-                                                      className="daily_stats_thumbnail_inner_div")
+                                                     className="daily_stats_thumbnail_inner_div")
     total_deaths = "TOTAL DEATHS", html.Br(), html.Div([df['new_deaths'][df['date'] <= date_selected].sum()],
-                                                        className="daily_stats_thumbnail_inner_div")
+                                                       className="daily_stats_thumbnail_inner_div")
     return new_cases, new_deaths, total_cases, total_deaths
 
 
@@ -256,7 +195,7 @@ def world_graph(stats_chosen, date_selected):
         mode='markers',
         marker=dict(
             color=dff[stats_chosen],
-            colorscale="Burg",
+            colorscale="reds",
             size=dff[stats_chosen],
             sizemode='area',
             sizeref=1. * max(dff[stats_chosen]) / (50. ** 2),
@@ -275,7 +214,7 @@ def world_graph(stats_chosen, date_selected):
     fig.update_layout(
         # title_text='Number of Covid-19 Cases Daily',
         # title_font_color=colors['text'],
-        width=800,
+        # width=800,
         # autosize=True,
         # height=700,
         margin=go.layout.Margin(
@@ -349,7 +288,8 @@ def world_graph(stats_chosen, date_selected):
 #         total_by_continent = px.bar(df, x="Total Deaths", y="Continent", color="Continent", text="Total Deaths",
 #                                     template="simple_white")
 #         total_by_continent.update_traces(texttemplate='%{text:.5s}', textposition='outside',
-#                                          hovertemplate='Continent: %{y} <br>Deaths: %{x}  <extra></extra>', textfont_color='#F4E808')
+#                                          hovertemplate='Continent: %{y} <br>Deaths: %{x}  <extra></extra>',
+#                                          textfont_color='#F4E808')
 #         total_by_continent.update_layout(showlegend=False,
 #                                          paper_bgcolor="#010310",
 #                                          plot_bgcolor="#010310",
@@ -403,22 +343,36 @@ def world_graph(stats_chosen, date_selected):
     Output(component_id='total_deaths_by_country', component_property='figure'),
     Output(component_id='daily_cases_by_country', component_property='figure'),
     Output(component_id='daily_deaths_by_country', component_property='figure'),
-    Input('country_name_dropdown', 'value'),
+    Input(component_id='country_name_dropdown', component_property='value'),
+    Input(component_id='table_stats', component_property='active_cell'),
+    State(component_id='table_stats', component_property='data'),
 )
-def line_chart_country(country_name):
-
+def line_chart_country(name_selected, active_cell, data):
+    if active_cell:
+        cell_data = data[active_cell['row']]
+        country_data = df.loc[(df['iso_code'] == cell_data['iso_code']) & (df['date'] == cell_data['date'].
+                                                                           split('T')[0])]
+        country_name = country_data['location'].to_string()
+        print(country_name)
+        print(type(country_name), '!!!!!!!!!!!!!!!!')
+        print(df.columns, '%%%%%%%%%%%')
+    elif name_selected:
+        country_name = name_selected
+        print(type(country_name), '@@@@@@@@@@@@@@@@@')
+    print(df)
+    print(df['location'])
     total_cases_by_country = px.bar(df[df['location'] == country_name], x="date", y="total_cases", color="location",
-                              hover_name="location", template="simple_white",
-                              labels={"location": "Country", "date": "Date", "total_cases": "Total Cases"}, )
+                                    hover_name="location", template="simple_white",
+                                    labels={"location": "Country", "date": "Date", "total_cases": "Total Cases"}, )
     total_deaths_by_country = px.bar(df[df['location'] == country_name], x="date", y="total_deaths", color="location",
-                               hover_name="location", template="simple_white",
+                                     hover_name="location", template="simple_white",
                                      labels={"location": "Country", "date": "Date", "total_deaths": "Total Deaths"})
     daily_cases_by_country = px.bar(df[df['location'] == country_name], x="date", y="new_cases", color="location",
-                              hover_name="location", template="simple_white",
-                              labels={"location": "Country", "date": "Date", "new_cases": "New Cases"}, )
+                                    hover_name="location", template="simple_white",
+                                    labels={"location": "Country", "date": "Date", "new_cases": "New Cases"}, )
     daily_deaths_by_country = px.bar(df[df['location'] == country_name], x="date", y="new_deaths", color="location",
-                               hover_name="location", template="simple_white",
-                               labels={"location": "Country", "date": "Date", "new_deaths": "New Deaths"})
+                                     hover_name="location", template="simple_white",
+                                     labels={"location": "Country", "date": "Date", "new_deaths": "New Deaths"})
     title_format = ['Daily', 'Total']
     for index, graph in enumerate([total_cases_by_country, daily_cases_by_country]):
         graph.update_layout(
@@ -437,17 +391,18 @@ def line_chart_country(country_name):
         )
         # axes legend
         graph.update_xaxes(showline=True, linewidth=2, linecolor='#F4E808',
-                                      titlefont={"size": 14, "color": "#F4E808"}, ticks="inside", tickwidth=1,
-                                      tickcolor='#F4E808', ticklen=5)
+                           titlefont={"size": 14, "color": "#F4E808"}, ticks="inside", tickwidth=1,
+                           tickcolor='#F4E808', ticklen=5)
         graph.update_yaxes(showline=True, linewidth=2, linecolor='#F4E808',
-                                      titlefont={"size": 14, "color": "#F4E808"}, ticks="inside", tickwidth=1,
-                                      tickcolor='#F4E808', ticklen=5)
+                           titlefont={"size": 14, "color": "#F4E808"}, ticks="inside", tickwidth=1,
+                           tickcolor='#F4E808', ticklen=5)
+        graph.update_traces(marker_color='#F4E808', marker_line=dict(width=2, color='#F4E808'))
     for index, graph in enumerate([total_deaths_by_country, daily_deaths_by_country]):
         graph.update_layout(
             showlegend=False,
             plot_bgcolor="#010310",
             paper_bgcolor='#010310',
-            title= title_format[index] + ' Deaths in ' + country_name,
+            title=title_format[index] + ' Deaths in ' + country_name,
             titlefont={"size": 12, "color": "#F4E808"},
             xaxis=dict(
                 tickfont={"size": 12, "color": "#F4E808"}
@@ -457,11 +412,12 @@ def line_chart_country(country_name):
             )
         )
         graph.update_xaxes(showline=True, linewidth=2, linecolor='#F4E808',
-                                      titlefont={"size": 14, "color": "#F4E808"}, ticks="inside", tickwidth=1,
-                                      tickcolor='#F4E808', ticklen=5)
+                           titlefont={"size": 14, "color": "#F4E808"}, ticks="inside", tickwidth=1,
+                           tickcolor='#F4E808', ticklen=5)
         graph.update_yaxes(showline=True, linewidth=2, linecolor='#F4E808',
-                                      titlefont={"size": 14, "color": "#F4E808"}, ticks="inside", tickwidth=1,
-                                      tickcolor='#F4E808', ticklen=5)
+                           titlefont={"size": 14, "color": "#F4E808"}, ticks="inside", tickwidth=1,
+                           tickcolor='#F4E808', ticklen=5)
+        graph.update_traces(marker_color='#F4E808', marker_line=dict(width=2, color='#F4E808'))
 
     return total_cases_by_country, total_deaths_by_country, daily_cases_by_country, daily_deaths_by_country
 
@@ -473,7 +429,7 @@ def line_chart_country(country_name):
 def update_output(n_clicks):
     return 'The input value was and the button has been clicked {} times'.format(
         n_clicks
-    ), all_news[n_clicks:]
+    ), latest_news(df)[n_clicks:]
 
 
 if __name__ == '__main__':
