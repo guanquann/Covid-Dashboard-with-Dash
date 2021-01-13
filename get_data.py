@@ -1,7 +1,7 @@
 import requests
 import pandas as pd
 import dash_html_components as html
-
+import os
 
 def latest_covid_data(csv_file):
     df = pd.read_csv(csv_file)
@@ -56,7 +56,7 @@ def latest_news(df):
            'from={}'
            'sources=bbc-news&'
            'sortBy=popularity&'
-           'apiKey=bf25476268b640d0a6972e685f1c7215'.format(df['date'].max()))
+           'apiKey={}'.format(df['date'].max(), os.getenv('API')))
 
     response = requests.get(url)
 

@@ -14,8 +14,9 @@ body {
     width: 19%;
     font-size: 1.7vw;
     display: inline-block;
-    margin-right: 4%;
-    background-color: #F4E808;   /* #F5765B  --orange */
+    margin-right: auto;
+    margin-left: auto;
+    background-color: #F4E808;
 }
 
 .daily_stats_thumbnail_display {
@@ -39,4 +40,8 @@ body {
     padding: 1px;
     width: 300px;
     background-color: white;
+}
+
+.tabs_bg {
+    background-color: #010310 !important
 }
