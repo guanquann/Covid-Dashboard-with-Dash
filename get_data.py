@@ -2,6 +2,8 @@ import requests
 import pandas as pd
 import dash_html_components as html
 import os
+from datetime import timedelta
+
 
 def latest_covid_data(csv_file):
     df = pd.read_csv(csv_file)
@@ -40,33 +42,39 @@ def latest_covid_data(csv_file):
     return df, country_name_list, numdate
 
 
-def generate_thumbnail(news_title, news_url, news_image_url):
+def generate_thumbnail(news_title, description, news_url, news_image_url):
     return html.Div([
-        html.Img(src=news_image_url,
-                 style={"width": "100%"}),
-        html.A(news_title, href=news_url, target='_blank'),
+        html.Div([
+            html.Img(src=news_image_url,
+                     style={"width": "25%", "vertical-align": "top"}),
+            html.Div([
+                html.P(html.U(html.B(news_title))),
+                html.Span(description+" ", style={"font-size": "13"}),
+                html.A("Read More", href=news_url, target='_blank'),
+                ], style={"width": "70%", "display": "inline-block", "color": "white"})])
     ], className="newspaper_thumbnail")
 
 
 def latest_news(df):
-    all_news = []
+    all_news = set()
     url = ('http://newsapi.org/v2/everything?'
            'language=en&'
+           'q=coronavirus&'
            'q=covid-19&'
-           'from={}'
-           'sources=bbc-news&'
-           'sortBy=popularity&'
-           'apiKey={}'.format(df['date'].max(), os.getenv('API')))
-
+           'from={}&to={}&'
+           'apiKey={}'.format(df['date'].max().to_pydatetime()-timedelta(days=3), df['date'].max(), os.getenv('API')))
     response = requests.get(url)
 
     for news in response.json()['articles']:
-        if 'vaccine' in news['title'].lower() or 'vaccination' in news['title'].lower() \
-                or 'coronavirus' in news['title'].lower() or 'covid' in news['title'].lower() or 'lockdown' in news['title'].lower():
-            title = news['title']
-            # print(title, 'TITLE', len(title))
-            # if len(news['title']) <= 39:
-            #     title = news['title'] + ' &#10;'
-            # print(title)
-            all_news.append(generate_thumbnail(title, news['url'], news['urlToImage']))
-    return all_news
+        list_of_words = ['vaccine', 'vaccination', 'coronavirus', 'covid', 'lockdown', 'virus']
+        for common_word in list_of_words:
+            if common_word in news['title'].lower():
+                title = news['title']
+                all_news.add(generate_thumbnail(title, news['description'], news['url'], news['urlToImage']))
+                break
+    return list(all_news)
+
+# print(title, 'TITLE', len(title))
+# if len(news['title']) <= 39:
+#     title = news['title'] + ' &#10;'
+# print(title)

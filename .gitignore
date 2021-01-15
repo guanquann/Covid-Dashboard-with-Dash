@@ -1,4 +1,7 @@
 .idea
 __pycache__/
 .git
-venv/
+venv
+*.pyc
+.DS_Store
+.env

@@ -8,6 +8,37 @@ body {
     color: #F4E808;
 }
 
+/*Colour of calendar div*/
+input[type=email], input[type=number], input[type=search], input[type=text], input[type=tel], input[type=url], input[type=password], textarea, select {
+    background-color: #F4E808;
+    border: 1px solid #F4E808;
+    font-size: 3vh;
+    height: 5vh;
+}
+
+/*Colour of selected date in calendar*/
+.CalendarDay__selected, .CalendarDay__selected:active, .CalendarDay__selected:hover {
+    background-color: #EC7575;
+}
+
+/*Contents inside the dropdown*/
+#type_of_stats .Select-value {
+    background-color: #F4E808;
+    color: #EC7575;  /*colour of contents inside dropdown when mouse over it */
+    font-size: 3vh;
+}
+
+/*div of type of stats*/
+#type_of_stats .Select-multi-value-wrapper {
+    width:180px;
+    max-width:15%;
+    /*height:5vh;*/
+}
+
+#type_of_stats .VirtualizedSelectFocusedOption {
+    background-color: #EC7575;
+}
+
 .daily_stats_thumbnail {
     border-radius: 5px;
     text-align: center;
@@ -32,16 +63,27 @@ body {
     font-size: 2vw;
 }
 
-.newspaper_thumbnail {
-    border: 2px black solid;
-    text-align: left;
-    display: inline-block;
-    font-size: 15px;
-    padding: 1px;
-    width: 300px;
-    background-color: white;
+.geo_scatter {
+    margin: 3%;
+    width: 50%;
+    min-width: 350px;
 }
 
-.tabs_bg {
-    background-color: #010310 !important
+.newspaper_thumbnail {
+    border: 1px solid white;
+    text-align: left;
+    font-size: 16px;
+    padding: 1px;
+    width: 70%;
+    background-color: #010310;
+}
+
+.spinner_bg {
+    background-color: #010310 !important;
+    z-index: 500 !important;
+}
+
+.spinner_dimension {
+    width:10rem;
+    height: 10rem
 }
