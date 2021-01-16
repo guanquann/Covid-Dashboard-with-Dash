@@ -1,8 +1,4 @@
 import dash
-import dash_table
-import dash_bootstrap_components as dbc
-import dash_core_components as dcc
-from dash.dependencies import Input, Output, State
 import plotly.graph_objects as go
 import plotly.express as px
 import time
@@ -31,110 +27,7 @@ def load_output(n):
     return
 
 
-app.layout = html.Div(style={'backgroundColor': colors['bg']}, children=[
-    html.Div(
-        [
-            dbc.Spinner(html.Div(id="loading-output"), fullscreen=True, color="primary",
-                        fullscreenClassName="spinner_bg", spinnerClassName="spinner_dimension"),
-        ]
-    ),
-
-    html.H1('Coronavirus Disease (COVID-19) Dashboard', className="title"),
-
-    html.Div([
-              html.Div([
-                    dcc.DatePickerSingle(id='date', min_date_allowed=min(df['date']), max_date_allowed=df['date'].max(),
-                                         date=str(df['date'].max().to_pydatetime()-timedelta(days=1)).split(' ')[0],
-                                         style={'display': 'inline-block', 'vertical-align': 'top'}),
-                    dcc.Dropdown(
-                        id='type_of_stats',
-                        options=[
-                          {'label': "Daily Statistics", 'value': 'today'},
-                          {'label': 'Total Statistics', 'value': 'total'},
-                        ],
-                        value='today', style={'display': 'inline-block', 'vertical-align': 'top'})],
-                  style={'width': '80%', "margin-left": "3%"}),
-              ]),
-
-    html.Div([
-        html.Div(id='new_cases', className="daily_stats_thumbnail"),
-        html.Div(id='new_deaths', className="daily_stats_thumbnail"),
-        html.Div(id='total_cases', className="daily_stats_thumbnail"),
-        html.Div(id='total_deaths', className="daily_stats_thumbnail"),
-        html.Div(id='total_vaccines', className="daily_stats_thumbnail"),
-    ], className="daily_stats_thumbnail_display"),
-
-    html.Div([
-        dcc.Graph(id='graph', figure={}, className="geo_scatter"),
-
-        dbc.Card(
-            [
-                dbc.Tabs(
-                    [
-                        dbc.Tab(tab1_content, label="CASES", tab_id="cases", label_style={"color": "red",
-                                                                                          "border-radius": "0"}),
-                        dbc.Tab(tab2_content, label="DEATHS", tab_id="deaths", label_style={"border-radius": "0"}),
-                    ],
-                    id="card-tabs",
-                    card=True,
-                    active_tab="cases",
-                    style={"background-color": "#010310"}
-                ),
-            ], style={"width": "50%", "background-color": "#010310"}
-        )], style={"display": "flex"}),
-
-    # dcc.Graph(id='daily_by_continent', figure={}, style={"margin": "3%", "border-radius": "5px"}),
-
-    html.Div([dash_table.DataTable(
-        id="table_stats",
-        columns=[{"name": col, "id": ['location', 'total_cases', 'new_cases', 'total_deaths', 'new_deaths',
-                                      "population", "total_vaccinations", "total_cases_per_million",
-                                      "total_deaths_per_million"][idx]}
-                 for (idx, col) in enumerate(['Country', 'Confirmed', '\u21E7 Cases', 'Deaths', '\u21E7 Deaths',
-                                              "Population", "Vaccination", "Confirm/1M", "Deaths/1M"])],
-        fixed_rows={'headers': True},
-        style_table={'height': '300px', 'overflowY': 'auto'},
-        style_cell_conditional=[
-            {'if': {'column_id': 'location'},
-             'width': '15%', 'textAlign': 'left'}],
-        style_header={
-            'backgroundColor': '#F4E808',
-            'color': '#010310',
-            'fontWeight': 'bold',
-            'fontSize': '15px',
-         },
-        style_cell={
-            'backgroundColor': '#010310',
-            'color': '#F4E808',
-            'fontSize': '15px',
-            'textAlign': 'left',
-            'width': '7%',
-        },
-        # Remove vertical lines
-        style_as_list_view=True,
-        sort_action="native",)],
-        style={"margin": "3%", "border": "2px black solid"}),
-
-    html.Div([dcc.Dropdown(
-        id='country_name_dropdown',
-        options=country_name_list,
-        value='United States',
-        style={'width': '40%', 'display': 'inline-block'},
-    )]),
-
-    html.Div([
-        dcc.Graph(id='total_cases_by_country', figure={}, style={"max-width": "50%"}),
-        dcc.Graph(id='daily_cases_by_country', figure={}, style={"max-width": "50%"})],
-        style={'display': 'flex', 'width': '100%'}),
-
-    html.Div([
-        dcc.Graph(id='total_deaths_by_country', figure={}, style={"max-width": "50%"}),
-        dcc.Graph(id='daily_deaths_by_country', figure={}, style={"max-width": "50%"})
-    ],
-        style={'display': 'flex', 'width': '100%'}),
-
-    html.Div(id='news_location'),
-    ])
+app.layout = make_layout()
 
 
 @app.callback(
@@ -199,7 +92,8 @@ def world_graph(stats_chosen, date_selected):
         layout=go.Layout(geo=dict(bgcolor='#010310'),
                          paper_bgcolor='#010310',))
     fig.update_geos(
-        resolution=50,
+        # default resolution is 110, which is much faster/less lag. But less countries shown
+        # resolution=50,
         showcoastlines=True, coastlinecolor="#071260",
         showland=True, landcolor="#071260",
         showocean=True, oceancolor="#010310",
@@ -220,48 +114,70 @@ def world_graph(stats_chosen, date_selected):
         ),
         showlegend=False,
     )
+
     return fig
-
-
-# @app.clientside_callback(
-#     """
-#     function(by_deaths_or_cases) {
-#         list_of_continent =
-#         return total_by_continent, sort_by_continent
-#     }
-#     """,
-#     Output(component_id='total_by_continent', component_property='figure'),
-#     Output(component_id='daily_by_continent', component_property='figure'),
-#     Input(component_id='deaths_or_cases', component_property='value')
-# )
 
 
 @app.callback(
     Output(component_id='total_cases_by_continent', component_property='figure'),
     Output(component_id='total_deaths_by_continent', component_property='figure'),
-    # Output(component_id='daily_by_continent', component_property='figure'),
-    Input(component_id='date', component_property='date')
+    Output(component_id='total_vaccines_by_continent', component_property='figure'),
+    Input(component_id='date', component_property='date'),
+    Input(component_id='type_of_stats', component_property='value')
 )
-def line_chart_continent(date):
+def world_stats(date, stats_chosen):
     # https://plotly.com/python/axes/#set-axis-title-text-with-plotly-express
     list_of_continent = list(df['continent'].unique())
-    total_cases = []
-    for continent in list_of_continent:
-        total_cases.append(df[df['continent'] == continent].max()['total_cases'])
-    graph_df = pd.DataFrame({'Continent': list_of_continent, 'Total Cases': total_cases})
-    total_cases_by_continent = px.bar(graph_df, x="Total Cases", y="Continent", color="Continent", text="Total Cases",
-                                      template="simple_white")
+    if stats_chosen == 'total':
+        cases = []
+        for continent in list_of_continent:
+            # () is necessary when using & inside df
+            cases.append(df[(df['continent'] == continent) & (df['date'] == date)].sum()['total_cases'])
+        graph_df = pd.DataFrame({'Continent': list_of_continent, 'Total Cases': cases})
+        cases_by_continent = px.bar(graph_df, x="Total Cases", y="Continent", color="Continent", text="Total Cases",
+                                    template="simple_white")
 
-    total_deaths = []
-    for continent in list_of_continent:
-        total_deaths.append(df[df['continent'] == continent].max()['total_deaths'])
-    graph_df = pd.DataFrame({'Continent': list_of_continent, 'Total Deaths': total_deaths})
-    total_deaths_by_continent = px.bar(graph_df, x="Total Deaths", y="Continent", color="Continent",
-                                       text="Total Deaths", template="simple_white")
-    graphs = [total_cases_by_continent, total_deaths_by_continent]
-    for i in range(2):
+        deaths = []
+        for continent in list_of_continent:
+            deaths.append(df[(df['continent'] == continent) & (df['date'] == date)].sum()['total_deaths'])
+        graph_df = pd.DataFrame({'Continent': list_of_continent, 'Total Deaths': deaths})
+        deaths_by_continent = px.bar(graph_df, x="Total Deaths", y="Continent", color="Continent",
+                                     text="Total Deaths", template="simple_white")
+
+        vaccines = []
+        for continent in list_of_continent:
+            vaccines.append(df[(df['continent'] == continent) & (df['date'] == date)].sum()['total_vaccinations'])
+        graph_df = pd.DataFrame({'Continent': list_of_continent, 'Total Vaccinations': vaccines})
+        vaccines_by_continent = px.bar(graph_df, x="Total Vaccinations", y="Continent", color="Continent",
+                                       text="Total Vaccinations", template="simple_white")
+    else:
+        cases = []
+        for continent in list_of_continent:
+            # () is necessary when using & inside df
+            cases.append(df[(df['continent'] == continent) & (df['date'] == date)].sum()['new_cases'])
+        graph_df = pd.DataFrame({'Continent': list_of_continent, 'Today Cases': cases})
+        cases_by_continent = px.bar(graph_df, x="Today Cases", y="Continent", color="Continent",
+                                    text="Today Cases", template="simple_white")
+
+        deaths = []
+        for continent in list_of_continent:
+            deaths.append(df[(df['continent'] == continent) & (df['date'] == date)].sum()['new_deaths'])
+        graph_df = pd.DataFrame({'Continent': list_of_continent, 'Today Deaths': deaths})
+        deaths_by_continent = px.bar(graph_df, x="Today Deaths", y="Continent", color="Continent",
+                                     text="Today Deaths", template="simple_white")
+
+        vaccines = []
+        for continent in list_of_continent:
+            vaccines.append(df[(df['continent'] == continent) & (df['date'] == date)].sum()['new_vaccinations'])
+        graph_df = pd.DataFrame({'Continent': list_of_continent, 'Today Vaccinations': vaccines})
+        vaccines_by_continent = px.bar(graph_df, x="Today Vaccinations", y="Continent", color="Continent",
+                                       text="Today Vaccinations", template="simple_white")
+
+    graphs = [cases_by_continent, deaths_by_continent, vaccines_by_continent]
+    text = ['Cases', 'Deaths', 'Vaccines']
+    for i in range(3):
         graphs[i].update_traces(texttemplate='%{text:.4s}', textposition='auto',
-                                hovertemplate='Continent: %{y} <br>Cases: %{x}  <extra></extra>', )
+                                hovertemplate='Continent: %{y} <br>'+text[i]+': %{x}  <extra></extra>', )
         graphs[i].update_layout(showlegend=False,
                                 paper_bgcolor="#010310",
                                 plot_bgcolor="#010310",
@@ -275,7 +191,7 @@ def line_chart_continent(date):
         graphs[i].update_xaxes(title_font=dict(color="#F4E808"))
         graphs[i].update_yaxes(title_font=dict(color="#F4E808"))
 
-    return total_cases_by_continent, total_deaths_by_continent
+    return cases_by_continent, deaths_by_continent, vaccines_by_continent
 
 
 @app.callback(

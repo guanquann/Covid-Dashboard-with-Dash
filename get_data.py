@@ -14,7 +14,7 @@ def latest_covid_data(csv_file):
     # Get just the relevant columns
     df = df[["iso_code", "continent", "location", "date", "total_cases", "new_cases", "total_deaths", "new_deaths",
              "total_cases_per_million", "new_cases_per_million", "total_deaths_per_million", "new_deaths_per_million",
-             "population", "total_vaccinations"]]
+             "population", "total_vaccinations", "new_vaccinations"]]
 
     # Continent that are N.A. means total world statistics
     df = df[df['continent'].notna()]

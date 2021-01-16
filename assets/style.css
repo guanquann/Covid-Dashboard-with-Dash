@@ -25,24 +25,35 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
 #type_of_stats .Select-value {
     background-color: #F4E808;
     color: #EC7575;  /*colour of contents inside dropdown when mouse over it */
-    font-size: 3vh;
+    font-size: 2.5vh;
 }
 
-/*div of type of stats*/
+/*div of type of stats (daily/total stats) */
 #type_of_stats .Select-multi-value-wrapper {
     width:180px;
     max-width:15%;
     /*height:5vh;*/
 }
 
+/*colour of type of stats div*/
 #type_of_stats .VirtualizedSelectFocusedOption {
     background-color: #EC7575;
+}
+
+/*outline of tab*/
+.card {
+    background-color: #F4E808;
+}
+
+.card-header-tabs {
+    margin-left: 0px;
 }
 
 .daily_stats_thumbnail {
     border-radius: 5px;
     text-align: center;
-    width: 19%;
+    font-weight: bold;
+    width: 16%;
     font-size: 1.7vw;
     display: inline-block;
     margin-right: auto;
@@ -67,6 +78,29 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     margin: 3%;
     width: 50%;
     min-width: 350px;
+}
+
+#country_name_dropdown .Select-value {
+    background-color: #F4E808;
+    color: #EC7575;  /*colour of contents inside dropdown when mouse over it */
+    font-size: 3vh;
+}
+
+/*div of type of stats (daily/total stats) */
+#country_name_dropdown .Select-multi-value-wrapper {
+    width:180px;
+    max-width:15%;
+    /*height:5vh;*/
+}
+
+/*colour of type of stats div*/
+#country_name_dropdown .VirtualizedSelectFocusedOption {
+    background-color: #EC7575;
+}
+
+/*colour of div for dropdown if not option is selected*/
+.Select-control {
+    background-color: #EC7575;
 }
 
 .newspaper_thumbnail {
