@@ -1,15 +1,15 @@
-Brotli @ file:///C:/ci/brotli-split_1602517705222/work
+Brotli==1.0.9
 certifi==2020.12.5
 chardet==4.0.0
 click==7.1.2
-dash @ file:///tmp/build/80754af9/dash_1607621005479/work
+dash==1.18.1
 dash-bootstrap-components==0.11.1
 dash-core-components==1.14.1
 dash-html-components==1.1.1
 dash-renderer==1.8.3
 dash-table==4.11.1
 Flask==1.1.2
-Flask-Compress @ file:///tmp/build/80754af9/flask-compress_1605067594328/work
+Flask-Compress==1.8.0
 future==0.18.2
 gunicorn==20.0.4
 idna==2.10
@@ -21,18 +21,21 @@ mkl-fft==1.2.0
 mkl-random==1.1.1
 mkl-service==2.3.0
 nltk==3.5
-numpy @ file:///C:/ci/numpy_and_numpy_base_1603466732592/work
-pandas @ file:///C:/ci/pandas_1602083338010/work
-plotly @ file:///tmp/build/80754af9/plotly_1607536586307/work
-pycountry @ file:///home/conda/feedstock_root/build_artifacts/pycountry_1594052803371/work
+numpy==1.19.2
+pandas==1.1.3
+pip==20.3.3
+plotly==4.14.1
+pycountry==20.7.3
 python-dateutil==2.8.1
 pytz==2020.1
 PyYAML==5.3.1
 regex==2020.11.13
 requests==2.25.1
 retrying==1.3.3
+setuptools==51.0.0.post20201207
 six==1.15.0
 tqdm==4.55.2
 urllib3==1.26.2
 Werkzeug==1.0.1
+wheel==0.36.2
 wincertstore==0.2
