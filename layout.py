@@ -24,7 +24,8 @@ tab3_content = dbc.Card(
         [dcc.Graph(id='total_vaccines_by_continent', figure={}, style={"width": "90%", "min-width": "300px"})],
         style={"background-color": colors['bg'], "border-radius": "0"}), outline=colors['bg'], className="mt-3")
 
-df, country_name_list, numdate = latest_covid_data(r'C:\Users\Acer\PycharmProjects\temp\owid-covid-data.csv')
+# df = pd.read_csv(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
+df, country_name_list, numdate = latest_covid_data(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
 
 df_cols = ['Country', 'Total Cases', 'New Cases', 'Total Deaths', 'New Deaths']
 
