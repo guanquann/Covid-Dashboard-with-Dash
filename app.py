@@ -175,5 +175,5 @@ def update_output(date):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
-    # app.run_server(debug=False,  port=int(os.environ.get("PORT", 5000)), host='0.0.0.0')
+    # app.run_server(debug=True)
+    app.run_server(debug=False,  port=int(os.environ.get("PORT", 5000)), host='0.0.0.0')
