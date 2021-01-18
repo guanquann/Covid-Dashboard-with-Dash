@@ -73,8 +73,3 @@ def latest_news(df):
                 all_news.add(generate_thumbnail(title, news['description'], news['url'], news['urlToImage']))
                 break
     return list(all_news)
-
-# print(title, 'TITLE', len(title))
-# if len(news['title']) <= 39:
-#     title = news['title'] + ' &#10;'
-# print(title)

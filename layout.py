@@ -25,7 +25,7 @@ tab3_content = dbc.Card(
         style={"background-color": colors['bg'], "border-radius": "0"}), outline=colors['bg'], className="mt-3")
 
 # df = pd.read_csv(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
-df, country_name_list, numdate = latest_covid_data(r'owid-covid-data.csv')
+df, country_name_list, numdate = latest_covid_data(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
 
 df_cols = ['Country', 'Total Cases', 'New Cases', 'Total Deaths', 'New Deaths']
 
@@ -136,7 +136,7 @@ def make_layout():
             id='country_name_dropdown',
             options=country_name_list,
             value='United States',
-        )], style={'width': '40%', 'display': 'inline-block'}),
+        )], style={'width': '20%', 'display': 'inline-block', 'margin-left': '3%'}),
 
         html.Div([
             dcc.Graph(id='total_cases_by_country', figure={}, style={"max-width": "50%"}),
@@ -188,111 +188,3 @@ def data_bars(df, column):
         })
 
     return styles
-
-
-
-
-# @app.callback(
-#     Output(component_id='total_cases_by_continent', component_property='figure'),
-#     Output(component_id='total_deaths_by_continent', component_property='figure'),
-#     Output(component_id='total_vaccines_by_continent', component_property='figure'),
-#     Input(component_id='date', component_property='date'),
-#     Input(component_id='type_of_stats', component_property='value'),
-#     Input('total_cases_by_continent', 'clickData')
-# )
-# def world_stats(date, stats_chosen, drill_down):
-#     if drill_down and drill_down['points'][0]['label'] in ['Asia', 'Europe', 'Africa', 'North America',
-#                                                            'South America', 'Oceania']:
-#         continent = drill_down['points'][0]['label']
-#         data = df[(df['date'] == date) & (df['continent'] == continent)]
-#         countries_list = data['location'].to_list()
-#
-#         graph_df = pd.DataFrame({'Countries': countries_list,
-#                                  'Total Cases': data['total_cases'].to_list()})
-#         total_cases_by_country = px.bar(graph_df, x="Countries", y="Total Cases", color="Countries",
-#                                         template="simple_white",)
-#
-#         total_cases_by_country.update_traces(hovertemplate='Country: %{x} <br>' + 'Cases' + ': %{y}  <extra></extra>')
-#         total_cases_by_country.update_layout(showlegend=False,
-#                                              paper_bgcolor="#010310",
-#                                              plot_bgcolor="#010310",
-#                                              # xaxis, yaxis refers to the labels on the axes
-#                                              xaxis=dict(tickfont={"size": 12, "color": "#F4E808"}),
-#                                              yaxis=dict(tickfont={"size": 12, "color": "#F4E808"}),
-#                                              margin=dict(l=0, r=0, t=0, b=0, ),
-#                                              height=350,
-#                                              )
-#         # Colour of axes -> the straight line only
-#         total_cases_by_country.update_xaxes(title_font=dict(color="#F4E808"))
-#         total_cases_by_country.update_yaxes(title_font=dict(color="#F4E808"))
-#
-#         graph_df = pd.DataFrame({'Countries': countries_list,
-#                                  'Total Cases': data['total_deaths'].to_list()})
-#         total_deaths_by_country = px.bar(graph_df, x="Countries", y="Total Cases", color="Countries",
-#                                          template="simple_white",)
-#
-#         graph_df = pd.DataFrame({'Countries': countries_list,
-#                                  'Total Cases': data['total_vaccinations'].to_list()})
-#         total_vaccines_by_country = px.bar(graph_df, x="Countries", y="Total Cases", color="Countries",
-#                                            template="simple_white",)
-#         return total_cases_by_country, total_deaths_by_country, total_vaccines_by_country
-#
-#     list_of_continent = list(df['continent'].unique())
-#     if stats_chosen == 'total':
-#         cases, deaths, vaccines = list(), list(), list()
-#         for continent in list_of_continent:
-#             data = df[(df['continent'] == continent) & (df['date'] == date)].sum()
-#             cases.append(data['total_cases'])
-#             deaths.append(data['total_deaths'])
-#             vaccines.append(data['total_vaccinations'])
-#
-#         graph_df = pd.DataFrame({'Continent': list_of_continent, 'Total Cases': cases})
-#         cases_by_continent = px.bar(graph_df, x="Total Cases", y="Continent", color="Continent", text="Total Cases",
-#                                     template="simple_white")
-#
-#         graph_df = pd.DataFrame({'Continent': list_of_continent, 'Total Deaths': deaths})
-#         deaths_by_continent = px.bar(graph_df, x="Total Deaths", y="Continent", color="Continent",
-#                                      text="Total Deaths", template="simple_white")
-#
-#         graph_df = pd.DataFrame({'Continent': list_of_continent, 'Total Vaccinations': vaccines})
-#         vaccines_by_continent = px.bar(graph_df, x="Total Vaccinations", y="Continent", color="Continent",
-#                                        text="Total Vaccinations", template="simple_white")
-#     else:
-#         cases, deaths, vaccines = list(), list(), list()
-#         for continent in list_of_continent:
-#             data = df[(df['continent'] == continent) & (df['date'] == date)].sum()
-#             cases.append(data['new_cases'])
-#             deaths.append(data['new_deaths'])
-#             vaccines.append(data['new_vaccinations'])
-#
-#         graph_df = pd.DataFrame({'Continent': list_of_continent, 'Today Cases': cases})
-#         cases_by_continent = px.bar(graph_df, x="Today Cases", y="Continent", color="Continent",
-#                                     text="Today Cases", template="simple_white")
-#
-#         graph_df = pd.DataFrame({'Continent': list_of_continent, 'Today Deaths': deaths})
-#         deaths_by_continent = px.bar(graph_df, x="Today Deaths", y="Continent", color="Continent",
-#                                      text="Today Deaths", template="simple_white")
-#
-#         graph_df = pd.DataFrame({'Continent': list_of_continent, 'Today Vaccinations': vaccines})
-#         vaccines_by_continent = px.bar(graph_df, x="Today Vaccinations", y="Continent", color="Continent",
-#                                        text="Today Vaccinations", template="simple_white")
-#
-#     graphs = [cases_by_continent, deaths_by_continent, vaccines_by_continent]
-#     text = ['Cases', 'Deaths', 'Vaccines']
-#     for i in range(3):
-#         graphs[i].update_traces(texttemplate='%{text:.4s}', textposition='auto',
-#                                 hovertemplate='Continent: %{y} <br>'+text[i]+': %{x}  <extra></extra>', )
-#         graphs[i].update_layout(showlegend=False,
-#                                 paper_bgcolor="#010310",
-#                                 plot_bgcolor="#010310",
-#                                 # xaxis, yaxis refers to the labels on the axes
-#                                 xaxis=dict(tickfont={"size": 12, "color": "#F4E808"}),
-#                                 yaxis=dict(tickfont={"size": 12, "color": "#F4E808"}),
-#                                 margin=dict(l=0, r=0, t=0, b=0, ),
-#                                 height=350,
-#                                 )
-#         # Colour of axes -> the straight line only
-#         graphs[i].update_xaxes(title_font=dict(color="#F4E808"))
-#         graphs[i].update_yaxes(title_font=dict(color="#F4E808"))
-#
-#     return cases_by_continent, deaths_by_continent, vaccines_by_continent

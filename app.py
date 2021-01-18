@@ -130,7 +130,8 @@ def drill_down_vaccines(date, stats_chosen, drill_down):
         return total_vaccines_by_country
 
     list_of_continent = list(df['continent'].unique())
-    vaccines_by_continent = display_continent(stats_chosen, list_of_continent, "total_vaccinations", "Total Vaccinations", date)
+    vaccines_by_continent = display_continent(stats_chosen, list_of_continent, "total_vaccinations",
+                                              "Total Vaccinations", date)
     return vaccines_by_continent
 
 
@@ -174,5 +175,5 @@ def update_output(date):
 
 
 if __name__ == '__main__':
-    # app.run_server(debug=True)
-    app.run_server(debug=False,  port=int(os.environ.get("PORT", 5000)), host='0.0.0.0')
+    app.run_server(debug=True)
+    # app.run_server(debug=False,  port=int(os.environ.get("PORT", 5000)), host='0.0.0.0')

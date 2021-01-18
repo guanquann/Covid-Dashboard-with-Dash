@@ -11,8 +11,8 @@ body {
 input[type=email], input[type=number], input[type=search], input[type=text], input[type=tel], input[type=url], input[type=password], textarea, select {
     background-color: #F4E808;
     border: 1px solid #F4E808;
-    font-size: 3vh;
-    height: 5vh;
+    /*font-size: 3vh;
+    height: 5vh;*/
 }
 
 /*Colour of selected date in calendar*/
@@ -24,11 +24,12 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
 #type_of_stats .Select-value {
     background-color: #F4E808;
     color: #EC7575;  /*colour of contents inside dropdown when mouse over it */
-    font-size: 2.5vh;
+    /*font-size: 2.5vh;*/
 }
 
 /*div of type of stats (daily/total stats) */
 #type_of_stats .Select-multi-value-wrapper {
+    /*margin-right: 2%;*/
     width:180px;
     max-width:15%;
     /*height:5vh;*/
@@ -46,6 +47,7 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
 
 .card-header-tabs {
     margin-left: 0px;
+    margin-right: 0px;
 }
 
 .daily_stats_thumbnail {
@@ -86,7 +88,7 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
 #country_name_dropdown .Select-value {
     background-color: #F4E808;
     color: #EC7575;  /*colour of contents inside dropdown when mouse over it */
-    font-size: 3vh;
+    /*font-size: 3vh;*/
 }
 
 /*div of type of stats (daily/total stats) */
