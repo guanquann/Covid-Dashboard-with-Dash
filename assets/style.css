@@ -4,7 +4,6 @@ body {
 
 .title {
     text-align: center;
-    font-size: 5vh;
     color: #F4E808;
 }
 
@@ -54,10 +53,10 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     text-align: center;
     font-weight: bold;
     width: 16%;
-    font-size: 1.7vw;
+    font-size: 1.5vw;
     display: inline-block;
-    margin-right: auto;
-    margin-left: auto;
+    margin-right: 2.5%;
+    margin-left: 2.5%;
     background-color: #F4E808;
 }
 
@@ -72,6 +71,10 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     margin: 2%;
     border-radius: 3px;
     font-size: 2vw;
+}
+
+.new_stats_thumbnail_inner_div {
+    font-size: 1vw;
 }
 
 .geo_scatter {
