@@ -16,7 +16,7 @@ app = dash.Dash(__name__, title='Covid-19 Analytics',
 )
 def load_output(n):
     if n:
-        time.sleep(2.5)
+        time.sleep(3.5)
     return
 
 
@@ -137,14 +137,42 @@ def drill_down_vaccines(date, stats_chosen, drill_down):
 
 @app.callback(
     Output(component_id='total_cases_by_country', component_property='figure'),
-    Output(component_id='total_deaths_by_country', component_property='figure'),
     Output(component_id='daily_cases_by_country', component_property='figure'),
+    Input(component_id='country_name_dropdown', component_property='value'),
+    Input(component_id='table_stats', component_property='active_cell'),
+    Input(component_id='graph', component_property='clickData'),
+    State(component_id='table_stats', component_property='data'),
+)
+def country_cases_stats(name_selected, active_cell, clickdata, data):
+    if active_cell:
+        cell_data = data[active_cell['row']]
+        country_data = df.loc[(df['iso_code'] == cell_data['iso_code']) & (df['date'] == cell_data['date'].
+                                                                           split('T')[0])]
+        country_name = country_data['location'].to_string().split('    ')[1]
+    elif clickdata:
+        iso_code = clickdata['points'][0]['location']
+        country_name = df[df['iso_code'] == iso_code]['location'].values[0]
+    else:
+        country_name = name_selected
+
+    country_name_df = df[df['location'] == country_name]
+
+    total_cases_by_country = country_bar_graph(country_name_df, "total_cases", "Total Cases")
+    daily_cases_by_country = country_bar_graph(country_name_df, "new_cases", "New Cases")
+
+    total_cases_by_country, daily_cases_by_country = full_country_graphs(total_cases_by_country, daily_cases_by_country)
+
+    return total_cases_by_country, daily_cases_by_country
+
+
+@app.callback(
+    Output(component_id='total_deaths_by_country', component_property='figure'),
     Output(component_id='daily_deaths_by_country', component_property='figure'),
     Input(component_id='country_name_dropdown', component_property='value'),
     Input(component_id='table_stats', component_property='active_cell'),
     State(component_id='table_stats', component_property='data'),
 )
-def line_chart_country(name_selected, active_cell, data):
+def country_deaths_stats(name_selected, active_cell, data):
     if active_cell:
         cell_data = data[active_cell['row']]
         country_data = df.loc[(df['iso_code'] == cell_data['iso_code']) & (df['date'] == cell_data['date'].
@@ -155,16 +183,12 @@ def line_chart_country(name_selected, active_cell, data):
 
     country_name_df = df[df['location'] == country_name]
 
-    total_cases_by_country = country_bar_graph(country_name_df, "total_cases", "Total Cases")
     total_deaths_by_country = country_bar_graph(country_name_df, "total_deaths", "Total Deaths")
-    daily_cases_by_country = country_bar_graph(country_name_df, "new_cases", "New Cases")
     daily_deaths_by_country = country_bar_graph(country_name_df, "new_deaths", "New Deaths")
 
-    total_cases_by_country, daily_cases_by_country, total_deaths_by_country, daily_deaths_by_country = \
-        full_country_graphs(country_name, total_cases_by_country, daily_cases_by_country,
-                            total_deaths_by_country, daily_deaths_by_country)
+    total_deaths_by_country, daily_deaths_by_country = full_country_graphs(total_deaths_by_country, daily_deaths_by_country)
 
-    return total_cases_by_country, total_deaths_by_country, daily_cases_by_country, daily_deaths_by_country
+    return total_deaths_by_country, daily_deaths_by_country
 
 
 @app.callback(
@@ -175,5 +199,5 @@ def update_output(date):
 
 
 if __name__ == '__main__':
-    # app.run_server(debug=True)
-    app.run_server(debug=False,  port=int(os.environ.get("PORT", 5000)), host='0.0.0.0')
+    app.run_server(debug=True)
+    # app.run_server(debug=False,  port=int(os.environ.get("PORT", 5000)), host='0.0.0.0')

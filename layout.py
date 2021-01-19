@@ -25,7 +25,7 @@ tab3_content = dbc.Card(
         style={"background-color": colors['bg'], "border-radius": "0"}), outline=colors['bg'], className="mt-3")
 
 # df = pd.read_csv(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
-df, country_name_list, numdate = latest_covid_data(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
+df, country_name_list, numdate = latest_covid_data(r'owid-covid-data.csv')
 
 df_cols = ['Country', 'Total Cases', 'New Cases', 'Total Deaths', 'New Deaths']
 
@@ -87,23 +87,18 @@ def make_layout():
                         style={"background-color": "#010310"}
                     ),
                 ], style={"width": "50%", "background-color": "#010310"}
-            )], style={"display": "flex"}),
-
-        # dcc.Graph(id='daily_by_continent', figure={}, style={"margin": "3%", "border-radius": "5px"}),
+            )], style={"display": "flex", "margin-top": "1%"}),
 
         html.Div([dash_table.DataTable(
             id="table_stats",
             columns=[{"name": col, "id": ['location', 'total_cases', 'new_cases', 'total_deaths', 'new_deaths',
-                                          "population", "total_vaccinations", "total_cases_per_million",
+                                          "total_vaccinations", "total_cases_per_million",
                                           "total_deaths_per_million"][idx]}
                      for (idx, col) in enumerate(['Country', 'Confirmed', '\u21E7 Cases', 'Deaths', '\u21E7 Deaths',
-                                                  "Population", "Vaccination", "Confirm/1M", "Deaths/1M"])],
+                                                  "Vaccines", "Confirm/1M", "Deaths/1M"])],
             fixed_rows={'headers': True},
             style_table={'max-height': '300px', 'overflowY': 'auto'},
-            style_cell_conditional=[
-                {'if': {'column_id': 'location'},
-                 'width': '15%', 'textAlign': 'left', },
-            ],
+
             style_data_conditional=[
                 {
                     'if': {
@@ -125,12 +120,14 @@ def make_layout():
                 'color': '#F4E808',
                 'fontSize': '15px',
                 'textAlign': 'left',
-                'width': '7%',
+                'width': '8%',
             },
             # Remove vertical lines
             style_as_list_view=True,
             sort_action="native",)],
             style={"margin": "3%", "border": "2px black solid"}),
+
+        html.H2(id="country_name"),
 
         html.Div([dcc.Dropdown(
             id='country_name_dropdown',
@@ -149,8 +146,10 @@ def make_layout():
         ],
             style={'display': 'flex', 'width': '100%'}),
 
+        html.H2("Latest Covid-19 news around the world", className="news_main_header"),
         html.Div(id='news_location'),
-        # html.Div(id='dummy', style={"display": "none"}),
+
+        html.Div(id='dummy'),
         ])
 
 

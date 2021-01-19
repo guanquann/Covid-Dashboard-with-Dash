@@ -36,18 +36,19 @@ def geo_scatter_graph(data, stats_chosen):
         showcountries=True,
     )
     fig.update_layout(
-        # title_text='Number of Covid-19 Cases Daily',
-        # title_font_color=colors['text'],
+        title_text='Click on the bubble to see detailed <br>statistics of the country at the bottom!',
+        title_font_color=colors['text'],
         # width=800,
         # autosize=True,
-        height=350,
+        height=400,
         # Do this to minimise space between graph and outer div
-        margin=go.layout.Margin(l=0, r=0, b=0, t=0,),
+        margin=go.layout.Margin(l=0, r=0, b=0, t=70,),
         geo=dict(
             showframe=False,
             projection_type='equirectangular',
         ),
         showlegend=False,
+        clickmode='event+select',
     )
     return fig
 
@@ -58,16 +59,12 @@ def country_bar_graph(country_name, y_axis, graph_label):
                   {"location": "Country", "date": "Date", y_axis: graph_label})
 
 
-def full_country_graphs(country_name, total_cases_by_country, daily_cases_by_country,
-                        total_deaths_by_country, daily_deaths_by_country):
-    title_format = ['Total', 'Daily']
-    for index, graph in enumerate([total_cases_by_country, daily_cases_by_country]):
+def full_country_graphs(total_by_country, daily_by_country):
+    for index, graph in enumerate([total_by_country, daily_by_country]):
         graph.update_layout(
             showlegend=False,
             plot_bgcolor="#010310",
             paper_bgcolor='#010310',
-            title=title_format[index] + ' Cases in ' + country_name,
-            titlefont={"size": 12, "color": "#F4E808"},
             xaxis=dict(
                 tickfont={"size": 12, "color": "#F4E808"}
             ),
@@ -88,30 +85,7 @@ def full_country_graphs(country_name, total_cases_by_country, daily_cases_by_cou
                            tickcolor='#F4E808', ticklen=5)
         graph.update_traces(marker_color='#F4E808', marker_line=dict(width=2, color='#F4E808'))
 
-    for index, graph in enumerate([total_deaths_by_country, daily_deaths_by_country]):
-        graph.update_layout(
-            showlegend=False,
-            plot_bgcolor="#010310",
-            paper_bgcolor='#010310',
-            title=title_format[index] + ' Deaths in ' + country_name,
-            titlefont={"size": 12, "color": "#F4E808"},
-            xaxis=dict(
-                tickfont={"size": 12, "color": "#F4E808"}
-            ),
-            yaxis=dict(
-                tickfont={"size": 12, "color": "#F4E808"}
-            ),
-            # margin=dict(l=0, r=0, t=0, b=0),
-            height=350,
-        )
-        graph.update_xaxes(showline=True, linewidth=2, linecolor='#F4E808',
-                           titlefont={"size": 14, "color": "#F4E808"}, ticks="inside", tickwidth=1,
-                           tickcolor='#F4E808', ticklen=5)
-        graph.update_yaxes(showline=True, linewidth=2, linecolor='#F4E808',
-                           titlefont={"size": 14, "color": "#F4E808"}, ticks="inside", tickwidth=1,
-                           tickcolor='#F4E808', ticklen=5)
-        graph.update_traces(marker_color='#F4E808', marker_line=dict(width=2, color='#F4E808'))
-    return total_cases_by_country, daily_cases_by_country, total_deaths_by_country, daily_deaths_by_country
+    return total_by_country, daily_by_country
 
 
 def drill_down_continent(graph_df, y_axis):
@@ -138,7 +112,7 @@ def drill_down_continent(graph_df, y_axis):
 def display_continent(stats_chosen, list_of_continent, column_name, x_axis, date):
     type_list = list()
     if stats_chosen == 'total':
-        x_axis = "Total {}".format(x_axis)
+        # x_axis = "Total {}".format(x_axis)
         for continent in list_of_continent:
             data = df[(df['continent'] == continent) & (df['date'] == date)].sum()
             type_list.append(data[column_name])
@@ -148,7 +122,7 @@ def display_continent(stats_chosen, list_of_continent, column_name, x_axis, date
                                     template="simple_white")
 
     else:
-        x_axis = "Today {}".format(x_axis)
+        # x_axis = "Today {}".format(x_axis)
         for continent in list_of_continent:
             data = df[(df['continent'] == continent) & (df['date'] == date)].sum()
             type_list.append(data[column_name])

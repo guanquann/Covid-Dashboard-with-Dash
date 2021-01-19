@@ -108,13 +108,20 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     background-color: #EC7575;
 }
 
+.news_main_header {
+    color: white;
+    text-align: center;
+}
+
 .newspaper_thumbnail {
     border: 1px solid white;
     text-align: left;
     font-size: 16px;
     padding: 1px;
-    width: 70%;
+    width: 90%;
     background-color: #010310;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .spinner_bg {
