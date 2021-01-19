@@ -25,7 +25,7 @@ tab3_content = dbc.Card(
         style={"background-color": colors['bg'], "border-radius": "0"}), outline=colors['bg'], className="mt-3")
 
 # df = pd.read_csv(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
-df, country_name_list, numdate = latest_covid_data(r'owid-covid-data.csv')
+df, country_name_list, numdate = latest_covid_data(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
 
 df_cols = ['Country', 'Total Cases', 'New Cases', 'Total Deaths', 'New Deaths']
 
