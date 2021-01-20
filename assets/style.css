@@ -50,6 +50,12 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     margin-right: 0px;
 }
 
+.tab_style {
+    border-radius: 3px;
+    border: 0.5px solid;
+    font-weight: bold;
+}
+
 .daily_stats_thumbnail {
     border-radius: 5px;
     text-align: center;

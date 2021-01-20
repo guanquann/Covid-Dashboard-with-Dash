@@ -25,7 +25,7 @@ tab3_content = dbc.Card(
         style={"background-color": colors['bg'], "border-radius": "0"}), outline=colors['bg'], className="mt-3")
 
 # df = pd.read_csv(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
-df, country_name_list, numdate = latest_covid_data(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
+df, country_name_list, numdate = latest_covid_data(r'owid-covid-data.csv')
 
 df_cols = ['Country', 'Total Cases', 'New Cases', 'Total Deaths', 'New Deaths']
 
@@ -48,15 +48,24 @@ def make_layout():
                                              max_date_allowed=df['date'].max(),
                                              date=str(df['date'].max().to_pydatetime()-timedelta(days=1)).split(' ')[0],
                                              style={'display': 'inline-block', 'vertical-align': 'top'}),
+
+                        html.Div([dcc.Dropdown(
+                            id='country_name_dropdown',
+                            options=country_name_list,
+                            value='United States',
+                        )], style={'width': '10%', 'display': 'inline-block', 'margin-left': '3%'}),
+
                         dcc.Dropdown(
                             id='type_of_stats',
                             options=[
                               {'label': "Today Statistics", 'value': 'today'},
                               {'label': 'Total Statistics', 'value': 'total'},
                             ],
-                            value='today', style={'display': 'inline-block', 'vertical-align': 'top'})],
+                            value='today', style={'display': 'inline-block', 'vertical-align': 'top', 'margin-left': '3%'})],
                         style={'width': '80%', "margin-left": "3%"}),
                   ]),
+
+        html.H2(id="country_name", style={"margin-left": "5%", "color": "#F4E808"}),
 
         html.Div([
             html.Div(id='total_cases', className="daily_stats_thumbnail"),
@@ -69,24 +78,25 @@ def make_layout():
         html.Div([
             dcc.Graph(id='graph', figure={}, className="geo_scatter",
                       config={'displayModeBar': True, 'displaylogo': False, 'modeBarButtonsToRemove':
-                              ['zoom2d', 'hoverCompareCartesian', 'hoverClosestCartesian', 'toggleSpikelines']}),
+                              ['zoom2d', 'lasso2d', 'hoverCompareCartesian', 'hoverClosestCartesian', 'toggleSpikelines', 'toggleSpikelines', 'hoverClosestGeo']}),
 
             dbc.Card(
                 [
                     dbc.Tabs(
                         [
-                            dbc.Tab(tab1_content, label="CASES", tab_id="cases", label_style={"color": "orange", "border-radius": "3px", "border": "0.5px solid", "font-weight": "bold"}),
+                            dbc.Tab(tab1_content, label="CASES", tab_id="cases",
+                                    label_style={"color": "orange"}, className="tab_style"),
                             dbc.Tab(tab2_content, label="DEATHS", tab_id="deaths",
-                                    label_style={"color": "red", "border-radius": "3px", "border": "0.5px solid red", "font-weight": "bold"}),
+                                    label_style={"color": "red"}, className="tab_style"),
                             dbc.Tab(tab3_content, label="VACCINATIONS", tab_id="vaccinations",
-                                    label_style={"color": "green", "border-radius": "3px", "border": "0.5px solid green", "font-weight": "bold"}),
+                                    label_style={"color": "green"}, className="tab_style"),
                         ],
                         id="card-tabs",
                         card=True,
                         active_tab="cases",
                         style={"background-color": "#010310"}
                     ),
-                ], style={"width": "50%", "background-color": "#010310"}
+                ], style={"width": "50%", "background-color": "#010310", "display": "inline-block"}
             )], style={"display": "flex", "margin-top": "1%"}),
 
         html.Div([dash_table.DataTable(
@@ -94,8 +104,8 @@ def make_layout():
             columns=[{"name": col, "id": ['location', 'total_cases', 'new_cases', 'total_deaths', 'new_deaths',
                                           "total_vaccinations", "total_cases_per_million",
                                           "total_deaths_per_million"][idx]}
-                     for (idx, col) in enumerate(['Country', 'Confirmed', '\u21E7 Cases', 'Deaths', '\u21E7 Deaths',
-                                                  "Vaccines", "Confirm/1M", "Deaths/1M"])],
+                     for (idx, col) in enumerate(['Country', 'Cases', '\u21E7 Cases', 'Deaths', '\u21E7 Deaths',
+                                                  "Vaccines", "Cases/1M", "Deaths/1M"])],
             fixed_rows={'headers': True},
             style_table={'max-height': '300px', 'overflowY': 'auto'},
 
@@ -127,14 +137,6 @@ def make_layout():
             sort_action="native",)],
             style={"margin": "3%", "border": "2px black solid"}),
 
-        html.H2(id="country_name"),
-
-        html.Div([dcc.Dropdown(
-            id='country_name_dropdown',
-            options=country_name_list,
-            value='United States',
-        )], style={'width': '20%', 'display': 'inline-block', 'margin-left': '3%'}),
-
         html.Div([
             dcc.Graph(id='total_cases_by_country', figure={}, style={"max-width": "50%"}),
             dcc.Graph(id='daily_cases_by_country', figure={}, style={"max-width": "50%"})],
@@ -147,7 +149,7 @@ def make_layout():
             style={'display': 'flex', 'width': '100%'}),
 
         html.H2("Latest Covid-19 news around the world", className="news_main_header"),
-        html.Div(id='news_location'),
+        html.Div(id='news_location', style={"padding-bottom": "5%"}),
 
         html.Div(id='dummy'),
         ])

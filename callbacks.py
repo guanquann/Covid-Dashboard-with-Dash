@@ -36,13 +36,14 @@ def geo_scatter_graph(data, stats_chosen):
         showcountries=True,
     )
     fig.update_layout(
-        title_text='Click on the bubble to see detailed <br>statistics of the country at the bottom!',
+        title_text='Click on the bubble to see detailed statistics of the country at the bottom!',
+        title_font_size=11,
         title_font_color=colors['text'],
         # width=800,
         # autosize=True,
-        height=400,
+        height=430,
         # Do this to minimise space between graph and outer div
-        margin=go.layout.Margin(l=0, r=0, b=0, t=70,),
+        margin=go.layout.Margin(l=0, r=0, b=90, t=40,),
         geo=dict(
             showframe=False,
             projection_type='equirectangular',
@@ -112,7 +113,6 @@ def drill_down_continent(graph_df, y_axis):
 def display_continent(stats_chosen, list_of_continent, column_name, x_axis, date):
     type_list = list()
     if stats_chosen == 'total':
-        # x_axis = "Total {}".format(x_axis)
         for continent in list_of_continent:
             data = df[(df['continent'] == continent) & (df['date'] == date)].sum()
             type_list.append(data[column_name])
@@ -122,7 +122,6 @@ def display_continent(stats_chosen, list_of_continent, column_name, x_axis, date
                                     template="simple_white")
 
     else:
-        # x_axis = "Today {}".format(x_axis)
         for continent in list_of_continent:
             data = df[(df['continent'] == continent) & (df['date'] == date)].sum()
             type_list.append(data[column_name])
@@ -142,6 +141,10 @@ def display_continent(stats_chosen, list_of_continent, column_name, x_axis, date
                                      margin=dict(l=0, r=0, t=0, b=0),
                                      height=350,
                                      )
+    cases_by_continent.add_annotation(text="DrillDown available",
+                                      font={"color": "#F4E808", "size": 9},
+                                      xref="paper", yref="paper",
+                                      x=1.0, y=0.0, showarrow=False)
     # Colour of axes -> the straight line only
     cases_by_continent.update_xaxes(title_font=dict(color="#F4E808"))
     cases_by_continent.update_yaxes(title_font=dict(color="#F4E808"))

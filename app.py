@@ -6,9 +6,7 @@ from callbacks import *
 from get_data import *
 
 app = dash.Dash(__name__, title='Covid-19 Analytics',
-                external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css', dbc.themes.BOOTSTRAP],
-                meta_tags=[])
-# {"name": "viewport", "content": "width=device-width, initial-scale=1"}
+                external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css', dbc.themes.BOOTSTRAP])
 
 
 @app.callback(
@@ -27,8 +25,17 @@ server = app.server
 @app.callback(
     Output(component_id='table_stats', component_property='data'),
     Input(component_id='date', component_property='date'),
+    Input(component_id='country_name_dropdown', component_property='value'),
+    Input(component_id='graph', component_property='clickData'),
 )
-def table_data(date_selected):
+def table_data(date_selected, country_name_dropdown, clickdata):
+    if clickdata and dash.callback_context.triggered[0]['prop_id'] != 'country_name_dropdown.value':
+        iso_code = clickdata['points'][0]['location']
+        data_contents = df[(df['date'] == date_selected) & (df['iso_code'] == iso_code)].to_dict('records')
+        return data_contents
+    if country_name_dropdown:
+        data_contents = df[(df['date'] == date_selected) & (df['location'] == country_name_dropdown)].to_dict('records')
+        return data_contents
     data_contents = df[df['date'] == date_selected].to_dict('records')
     return data_contents
 
@@ -51,10 +58,11 @@ def stats(date_selected):
 
 @app.callback(
     Output(component_id='graph', component_property='figure'),
-    Input('type_of_stats', 'value'),
+    Input(component_id='type_of_stats', component_property='value'),
+    Input(component_id='country_name_dropdown', component_property='value'),
     Input(component_id='date', component_property='date')
 )
-def world_graph(stats_chosen, date_selected):
+def world_graph(stats_chosen, country_name, date_selected):
     dff = df[df['date'] == date_selected]
 
     if stats_chosen == 'today':
@@ -138,6 +146,7 @@ def drill_down_vaccines(date, stats_chosen, drill_down):
 @app.callback(
     Output(component_id='total_cases_by_country', component_property='figure'),
     Output(component_id='daily_cases_by_country', component_property='figure'),
+    Output(component_id='country_name', component_property='children'),
     Input(component_id='country_name_dropdown', component_property='value'),
     Input(component_id='table_stats', component_property='active_cell'),
     Input(component_id='graph', component_property='clickData'),
@@ -149,7 +158,8 @@ def country_cases_stats(name_selected, active_cell, clickdata, data):
         country_data = df.loc[(df['iso_code'] == cell_data['iso_code']) & (df['date'] == cell_data['date'].
                                                                            split('T')[0])]
         country_name = country_data['location'].to_string().split('    ')[1]
-    elif clickdata:
+    # Determining which Input has fired using dash.callback_context.triggered
+    elif clickdata and dash.callback_context.triggered[0]['prop_id'] != 'country_name_dropdown.value':
         iso_code = clickdata['points'][0]['location']
         country_name = df[df['iso_code'] == iso_code]['location'].values[0]
     else:
@@ -162,7 +172,7 @@ def country_cases_stats(name_selected, active_cell, clickdata, data):
 
     total_cases_by_country, daily_cases_by_country = full_country_graphs(total_cases_by_country, daily_cases_by_country)
 
-    return total_cases_by_country, daily_cases_by_country
+    return total_cases_by_country, daily_cases_by_country, country_name
 
 
 @app.callback(
@@ -186,7 +196,8 @@ def country_deaths_stats(name_selected, active_cell, data):
     total_deaths_by_country = country_bar_graph(country_name_df, "total_deaths", "Total Deaths")
     daily_deaths_by_country = country_bar_graph(country_name_df, "new_deaths", "New Deaths")
 
-    total_deaths_by_country, daily_deaths_by_country = full_country_graphs(total_deaths_by_country, daily_deaths_by_country)
+    total_deaths_by_country, daily_deaths_by_country = full_country_graphs(total_deaths_by_country,
+                                                                           daily_deaths_by_country)
 
     return total_deaths_by_country, daily_deaths_by_country
 
@@ -199,5 +210,5 @@ def update_output(date):
 
 
 if __name__ == '__main__':
-    # app.run_server(debug=True)
-    app.run_server(debug=False,  port=int(os.environ.get("PORT", 5000)), host='0.0.0.0')
+    app.run_server(debug=True)
+    # app.run_server(debug=False,  port=int(os.environ.get("PORT", 5000)), host='0.0.0.0')
