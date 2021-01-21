@@ -47,8 +47,8 @@ def table_data(date_selected, country_name_dropdown, clickdata):
     Input(component_id='date', component_property='date')
 )
 def stats(date_selected):
-    all_dates = df['date'] <= date_selected
-    today_date = df['date'] == date_selected
+    all_dates = (df['date'] <= date_selected) & (df['continent'] != 0)
+    today_date = (df['date'] == date_selected) & (df['continent'] != 0)
 
     total_cases = main_stats("Total Cases", "new_cases", all_dates, today_date)
     total_deaths = main_stats("Total Deaths", "new_deaths", all_dates, today_date)
@@ -58,12 +58,18 @@ def stats(date_selected):
 
 @app.callback(
     Output(component_id='graph', component_property='figure'),
-    Input(component_id='type_of_stats', component_property='value'),
+    Input(component_id='today_btn', component_property='n_clicks'),
+    Input(component_id='total_btn', component_property='n_clicks'),
     Input(component_id='country_name_dropdown', component_property='value'),
     Input(component_id='date', component_property='date')
 )
-def world_graph(stats_chosen, country_name, date_selected):
-    dff = df[df['date'] == date_selected]
+def world_graph(today_btn, total_btn, country_name, date_selected):
+    changed_id = dash.callback_context.triggered[0]['prop_id']
+    if changed_id == 'total_btn.n_clicks':
+        stats_chosen = 'total'
+    else:
+        stats_chosen = 'today'
+    dff = df[(df['date'] == date_selected) & (df['continent'] != 0)]
 
     if stats_chosen == 'today':
         stats_chosen = 'new_cases'
@@ -76,10 +82,16 @@ def world_graph(stats_chosen, country_name, date_selected):
 @app.callback(
     Output(component_id='total_cases_by_continent', component_property='figure'),
     Input(component_id='date', component_property='date'),
-    Input(component_id='type_of_stats', component_property='value'),
+    Input(component_id='today_btn', component_property='n_clicks'),
+    Input(component_id='total_btn', component_property='n_clicks'),
     Input('total_cases_by_continent', 'clickData')
 )
-def drill_down_cases(date, stats_chosen, drill_down):
+def drill_down_cases(date, today_btn, total_btn, drill_down):
+    changed_id = dash.callback_context.triggered[0]['prop_id']
+    if changed_id == 'total_btn.n_clicks':
+        stats_chosen = 'total'
+    else:
+        stats_chosen = 'today'
     if drill_down and drill_down['points'][0]['label'] in ['Asia', 'Europe', 'Africa', 'North America',
                                                            'South America', 'Oceania']:
         continent = drill_down['points'][0]['label']
@@ -92,17 +104,25 @@ def drill_down_cases(date, stats_chosen, drill_down):
         return total_cases_by_country
 
     list_of_continent = list(df['continent'].unique())
-    cases_by_continent = display_continent(stats_chosen, list_of_continent, "total_cases", "Total Cases", date)
+    list_of_continent.remove(0)
+    cases_by_continent = display_continent(stats_chosen, list_of_continent, "cases", "Total Cases", date)
     return cases_by_continent
 
 
 @app.callback(
     Output(component_id='total_deaths_by_continent', component_property='figure'),
     Input(component_id='date', component_property='date'),
-    Input(component_id='type_of_stats', component_property='value'),
+    Input(component_id='today_btn', component_property='n_clicks'),
+    Input(component_id='total_btn', component_property='n_clicks'),
     Input('total_deaths_by_continent', 'clickData')
 )
-def drill_down_deaths(date, stats_chosen, drill_down):
+def drill_down_deaths(date, today_btn, total_btn, drill_down):
+    changed_id = dash.callback_context.triggered[0]['prop_id']
+    if changed_id == 'total_btn.n_clicks':
+        stats_chosen = 'total'
+    else:
+        stats_chosen = 'today'
+
     if drill_down and drill_down['points'][0]['label'] in ['Asia', 'Europe', 'Africa', 'North America',
                                                            'South America', 'Oceania']:
         continent = drill_down['points'][0]['label']
@@ -115,17 +135,24 @@ def drill_down_deaths(date, stats_chosen, drill_down):
         return total_deaths_by_country
 
     list_of_continent = list(df['continent'].unique())
-    deaths_by_continent = display_continent(stats_chosen, list_of_continent, "total_deaths", "Total Deaths", date)
+    list_of_continent.remove(0)
+    deaths_by_continent = display_continent(stats_chosen, list_of_continent, "deaths", "Total Deaths", date)
     return deaths_by_continent
 
 
 @app.callback(
     Output(component_id='total_vaccines_by_continent', component_property='figure'),
     Input(component_id='date', component_property='date'),
-    Input(component_id='type_of_stats', component_property='value'),
+    Input(component_id='today_btn', component_property='n_clicks'),
+    Input(component_id='total_btn', component_property='n_clicks'),
     Input('total_vaccines_by_continent', 'clickData')
 )
-def drill_down_vaccines(date, stats_chosen, drill_down):
+def drill_down_vaccines(date, today_btn, total_btn, drill_down):
+    changed_id = dash.callback_context.triggered[0]['prop_id']
+    if changed_id == 'total_btn.n_clicks':
+        stats_chosen = 'total'
+    else:
+        stats_chosen = 'today'
     if drill_down and drill_down['points'][0]['label'] in ['Asia', 'Europe', 'Africa', 'North America',
                                                            'South America', 'Oceania']:
         continent = drill_down['points'][0]['label']
@@ -138,7 +165,8 @@ def drill_down_vaccines(date, stats_chosen, drill_down):
         return total_vaccines_by_country
 
     list_of_continent = list(df['continent'].unique())
-    vaccines_by_continent = display_continent(stats_chosen, list_of_continent, "total_vaccinations",
+    list_of_continent.remove(0)
+    vaccines_by_continent = display_continent(stats_chosen, list_of_continent, "vaccinations",
                                               "Total Vaccinations", date)
     return vaccines_by_continent
 
@@ -210,5 +238,5 @@ def update_output(date):
 
 
 if __name__ == '__main__':
-    # app.run_server(debug=True)
-    app.run_server(debug=False,  port=int(os.environ.get("PORT", 5000)), host='0.0.0.0')
+    app.run_server(debug=True)
+    # app.run_server(debug=False,  port=int(os.environ.get("PORT", 5000)), host='0.0.0.0')

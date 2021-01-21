@@ -113,18 +113,20 @@ def drill_down_continent(graph_df, y_axis):
 def display_continent(stats_chosen, list_of_continent, column_name, x_axis, date):
     type_list = list()
     if stats_chosen == 'total':
+        col_name = 'total_{}'.format(column_name)
         for continent in list_of_continent:
-            data = df[(df['continent'] == continent) & (df['date'] == date)].sum()
-            type_list.append(data[column_name])
+            data = df[(df['continent'] == continent) & (df['date'] == date)][col_name].sum()
+            type_list.append(data)
 
         graph_df = pd.DataFrame({'Continent': list_of_continent, x_axis: type_list})
         cases_by_continent = px.bar(graph_df, x=x_axis, y="Continent", color="Continent", text=x_axis,
                                     template="simple_white")
 
     else:
+        col_name = 'new_{}'.format(column_name)
         for continent in list_of_continent:
-            data = df[(df['continent'] == continent) & (df['date'] == date)].sum()
-            type_list.append(data[column_name])
+            data = df[(df['continent'] == continent) & (df['date'] == date)][col_name].sum()
+            type_list.append(data)
 
         graph_df = pd.DataFrame({'Continent': list_of_continent, x_axis: type_list})
         cases_by_continent = px.bar(graph_df, x=x_axis, y="Continent", color="Continent",

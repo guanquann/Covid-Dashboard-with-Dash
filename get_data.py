@@ -17,7 +17,7 @@ def latest_covid_data(csv_file):
              "population", "total_vaccinations", "new_vaccinations", "hosp_patients"]]
 
     # Continent that are N.A. means total world statistics
-    df = df[df['continent'].notna()]
+    # df = df[df['continent'].notna()]
 
     # Remove rows that are wrong value / empty
     df = df[df['date'].notna()]

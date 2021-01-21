@@ -5,6 +5,7 @@ body {
 .title {
     text-align: center;
     color: #F4E808;
+    padding-top: 3%;
 }
 
 /*Colour of calendar div*/
@@ -39,6 +40,49 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
 #type_of_stats .VirtualizedSelectFocusedOption {
     background-color: #EC7575;
 }
+
+.today_btn {
+    border-radius: 8px 0px 0px 8px;
+    border: 1px solid #F4E808;
+    color: #F4E808;
+    font-size: medium;
+    margin-left: 5%;
+    vertical-align: top;
+}
+
+.today_btn:hover {
+    border-radius: 8px 0px 0px 8px;
+    border: 1px solid #EC7575;
+    background-color: #EC7575;
+}
+
+.today_btn:focus {
+    border-radius: 8px 0px 0px 8px;
+    border: 1px solid #F4E808;
+    background-color: #F4E808;
+}
+
+
+.total_btn {
+    border-radius: 0px 8px 8px 0px;
+    border: 1px solid #F4E808;
+    color: #F4E808;
+    font-size: medium;
+    vertical-align: top;
+}
+
+.total_btn:hover {
+    border-radius: 0px 8px 8px 0px;
+    border: 1px solid #EC7575;
+    background-color: #EC7575;
+}
+
+.total_btn:focus {
+    border-radius: 0px 8px 8px 0px;
+    border: 1px solid #F4E808;
+    background-color: #F4E808;
+}
+
 
 /*outline of tab*/
 .card {
@@ -99,7 +143,7 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
 
 /*div of type of stats (daily/total stats) */
 #country_name_dropdown .Select-multi-value-wrapper {
-    width:180px;
+    width:60px;
     max-width:15%;
     /*height:5vh;*/
 }

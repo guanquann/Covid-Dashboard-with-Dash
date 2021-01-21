@@ -25,7 +25,7 @@ tab3_content = dbc.Card(
         style={"background-color": colors['bg'], "border-radius": "0"}), outline=colors['bg'], className="mt-3")
 
 # df = pd.read_csv(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
-df, country_name_list, numdate = latest_covid_data(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
+df, country_name_list, numdate = latest_covid_data(r'owid-covid-data.csv')
 
 df_cols = ['Country', 'Total Cases', 'New Cases', 'Total Deaths', 'New Deaths']
 
@@ -52,20 +52,22 @@ def make_layout():
                         html.Div([dcc.Dropdown(
                             id='country_name_dropdown',
                             options=country_name_list,
-                            value='United States',
+                            value='World',
                         )], style={'width': '10%', 'display': 'inline-block', 'margin-left': '3%'}),
 
-                        dcc.Dropdown(
-                            id='type_of_stats',
-                            options=[
-                              {'label': "Today Statistics", 'value': 'today'},
-                              {'label': 'Total Statistics', 'value': 'total'},
-                            ],
-                            value='today', style={'display': 'inline-block', 'vertical-align': 'top', 'margin-left': '3%'})],
+                        # dcc.Dropdown(
+                        #     id='type_of_stats',
+                        #     options=[
+                        #       {'label': "Today Statistics", 'value': 'today'},
+                        #       {'label': 'Total Statistics', 'value': 'total'},
+                        #     ],
+                        #     value='today', style={'display': 'inline-block', 'vertical-align': 'top', 'margin-left': '3%'}),
+                        html.Button("Today", id='today_btn', n_clicks=0, className="today_btn"),
+                        html.Button("Total", id='total_btn', n_clicks=0, className="total_btn"),
+                  ],
                         style={'width': '80%', "margin-left": "3%"}),
-                  ]),
 
-        html.H2(id="country_name", style={"margin-left": "5%", "color": "#F4E808"}),
+                  ]),
 
         html.Div([
             html.Div(id='total_cases', className="daily_stats_thumbnail"),
@@ -74,6 +76,7 @@ def make_layout():
         ], className="daily_stats_thumbnail_display"),
 
         # html.Div(dcc.Graph(id='testing')),
+        html.H2(id="country_name", style={"margin-left": "5%", "color": "#F4E808"}),
 
         html.Div([
             dcc.Graph(id='graph', figure={}, className="geo_scatter",
@@ -98,6 +101,8 @@ def make_layout():
                     ),
                 ], style={"width": "50%", "background-color": "#010310", "display": "inline-block"}
             )], style={"display": "flex", "margin-top": "1%"}),
+
+        # html.Button("Reset", id="reset_btn", n_clicks=0),
 
         html.Div([dash_table.DataTable(
             id="table_stats",
