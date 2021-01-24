@@ -158,9 +158,57 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     background-color: #EC7575;
 }
 
+#table_stats {
+    margin: 3%;
+    border: 2px black solid;
+    -ms-overflow-style: none;  /* hide scrollbar for IE and Edge */
+    scrollbar-width: none;  /* hide scrollbar for Firefox */
+}
+
+#table_stats::-webkit-scrollbar {
+    display: none;  /* hide scrollbar for Chrome */
+}
+
+.number_circle {
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    border: 1px solid #F4E808;
+    color: #F4E808;
+    text-align: center;
+    display: inline-block
+}
+
+br {
+  content: "";
+  margin: 2em;
+  display: block;
+  font-size: 24%;
+}
+
+.trending_stats {
+    display: inline-block;
+    color: #F4E808;
+    font-size: medium;
+    margin-left: 2%;
+    padding-left: 7px;
+    border: 1px solid #F4E808;
+    border-radius: 10px;
+    height: 640px;
+    overflow-y: auto;
+    width: 23%;
+    -ms-overflow-style: none;  /* hide scrollbar for IE and Edge */
+    scrollbar-width: none;  /* hide scrollbar for Firefox */
+}
+
+.trending_stats::-webkit-scrollbar {
+    display: none;  /* hide scrollbar for Chrome */
+}
+
 .news_main_header {
     color: white;
     text-align: center;
+    margin-top: 10%;
 }
 
 .newspaper_thumbnail {

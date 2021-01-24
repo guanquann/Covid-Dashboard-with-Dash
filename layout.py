@@ -55,13 +55,6 @@ def make_layout():
                             value='World',
                         )], style={'width': '10%', 'display': 'inline-block', 'margin-left': '3%'}),
 
-                        # dcc.Dropdown(
-                        #     id='type_of_stats',
-                        #     options=[
-                        #       {'label': "Today Statistics", 'value': 'today'},
-                        #       {'label': 'Total Statistics', 'value': 'total'},
-                        #     ],
-                        #     value='today', style={'display': 'inline-block', 'vertical-align': 'top', 'margin-left': '3%'}),
                         html.Button("Today", id='today_btn', n_clicks=0, className="today_btn"),
                         html.Button("Total", id='total_btn', n_clicks=0, className="total_btn"),
                   ],
@@ -139,21 +132,25 @@ def make_layout():
             },
             # Remove vertical lines
             style_as_list_view=True,
-            sort_action="native",)],
-            style={"margin": "3%", "border": "2px black solid"}),
+            sort_action="native",)]),
+
+        html.Div(id="top_stats", className="trending_stats"),
 
         html.Div([
-            dcc.Graph(id='total_cases_by_country', figure={}, style={"max-width": "50%"}),
-            dcc.Graph(id='daily_cases_by_country', figure={}, style={"max-width": "50%"})],
-            style={'display': 'flex', 'width': '100%'}),
+            html.Div([
+                dcc.Graph(id='total_cases_by_country', figure={}, style={"max-width": "50%"}),
+                dcc.Graph(id='daily_cases_by_country', figure={}, style={"max-width": "50%"})],
+                style={'display': 'flex'}),
 
-        html.Div([
-            dcc.Graph(id='total_deaths_by_country', figure={}, style={"max-width": "50%"}),
-            dcc.Graph(id='daily_deaths_by_country', figure={}, style={"max-width": "50%"})
-        ],
-            style={'display': 'flex', 'width': '100%'}),
+            html.Div([
+                dcc.Graph(id='total_deaths_by_country', figure={}, style={"max-width": "50%"}),
+                dcc.Graph(id='daily_deaths_by_country', figure={}, style={"max-width": "50%"})
+            ],
+                style={'display': 'flex'}),
+        ], style={'width': '74%', 'float': 'right'}),
 
         html.H2("Latest Covid-19 news around the world", className="news_main_header"),
+
         html.Div(id='news_location', style={"padding-bottom": "5%"}),
 
         html.Div(id='dummy'),

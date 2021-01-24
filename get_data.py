@@ -8,8 +8,8 @@ from datetime import timedelta
 def latest_covid_data(csv_file):
     df = pd.read_csv(csv_file)
 
-    # Identify rows that have new cases less than 0, which is impossible
-    df[df['new_cases'] < 0] = 0
+    # Identify rows that have new/total cases/deaths less than 0, which is impossible
+    df[(df['new_cases'] < 0) | (df['new_deaths'] < 0)] = 0
 
     # Get just the relevant columns
     df = df[["iso_code", "continent", "location", "date", "total_cases", "new_cases", "total_deaths", "new_deaths",

@@ -146,7 +146,7 @@ def display_continent(stats_chosen, list_of_continent, column_name, x_axis, date
     cases_by_continent.add_annotation(text="DrillDown available",
                                       font={"color": "#F4E808", "size": 9},
                                       xref="paper", yref="paper",
-                                      x=1.0, y=0.0, showarrow=False)
+                                      x=0.95, y=0.0, showarrow=False)
     # Colour of axes -> the straight line only
     cases_by_continent.update_xaxes(title_font=dict(color="#F4E808"))
     cases_by_continent.update_yaxes(title_font=dict(color="#F4E808"))
