@@ -9,25 +9,32 @@ colors = {
     'text': '#F4E808'
 }
 
+graph_config = {'displayModeBar': True, 'displaylogo': False, 'modeBarButtonsToRemove':
+                ['zoom2d', 'lasso2d', 'hoverCompareCartesian', 'hoverClosestCartesian', 'toggleSpikelines',
+                 'toggleSpikelines', 'hoverClosestGeo']}
+
+# df = pd.read_csv(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
+df, country_name_list, numdate = latest_covid_data(r'owid-covid-data.csv')
+
+df_cols = ['Country', 'Total Cases', 'New Cases', 'Total Deaths', 'New Deaths']
+
 tab1_content = dbc.Card(
     dbc.CardBody(
-        [dcc.Graph(id='total_cases_by_continent', figure={}, style={"width": "90%", "min-width": "300px"})],
+        [dcc.Graph(id='total_cases_by_continent', figure={}, className="graph_tabs", config=graph_config),
+         html.Button("Reset", id="drillback_cases", n_clicks=0, className="back_btn_drill_down")],
         style={"background-color": colors['bg'], "border-radius": "0"}), outline=colors['bg'], className="mt-3")
 
 tab2_content = dbc.Card(
     dbc.CardBody(
-        [dcc.Graph(id='total_deaths_by_continent', figure={}, style={"width": "90%", "min-width": "300px"})],
+        [dcc.Graph(id='total_deaths_by_continent', figure={}, className="graph_tabs", config=graph_config),
+         html.Button("Reset", id="drillback_deaths", n_clicks=0, className="back_btn_drill_down")],
         style={"background-color": colors['bg'], "border-radius": "0"}), outline=colors['bg'], className="mt-3")
 
 tab3_content = dbc.Card(
     dbc.CardBody(
-        [dcc.Graph(id='total_vaccines_by_continent', figure={}, style={"width": "90%", "min-width": "300px"})],
+        [dcc.Graph(id='total_vaccines_by_continent', figure={}, className="graph_tabs", config=graph_config),
+         html.Button("Reset", id="drillback_vaccines", n_clicks=0, className="back_btn_drill_down")],
         style={"background-color": colors['bg'], "border-radius": "0"}), outline=colors['bg'], className="mt-3")
-
-# df = pd.read_csv(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
-df, country_name_list, numdate = latest_covid_data(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
-
-df_cols = ['Country', 'Total Cases', 'New Cases', 'Total Deaths', 'New Deaths']
 
 
 def make_layout():
@@ -73,8 +80,7 @@ def make_layout():
 
         html.Div([
             dcc.Graph(id='graph', figure={}, className="geo_scatter",
-                      config={'displayModeBar': True, 'displaylogo': False, 'modeBarButtonsToRemove':
-                              ['zoom2d', 'lasso2d', 'hoverCompareCartesian', 'hoverClosestCartesian', 'toggleSpikelines', 'toggleSpikelines', 'hoverClosestGeo']}),
+                      config=graph_config),
 
             dbc.Card(
                 [
@@ -96,6 +102,9 @@ def make_layout():
             )], style={"display": "flex", "margin-top": "1%"}),
 
         # html.Button("Reset", id="reset_btn", n_clicks=0),
+
+        html.Div("Click the country name you are interested in to look at its graphs below!",
+                 style={"color": "#F4E808", "font-size": "medium", "margin-left": "3%"}),
 
         html.Div([dash_table.DataTable(
             id="table_stats",
@@ -138,22 +147,19 @@ def make_layout():
 
         html.Div([
             html.Div([
-                dcc.Graph(id='total_cases_by_country', figure={}, style={"max-width": "50%"}),
-                dcc.Graph(id='daily_cases_by_country', figure={}, style={"max-width": "50%"})],
+                dcc.Graph(id='total_cases_by_country', figure={}, style={"max-width": "50%"}, config=graph_config),
+                dcc.Graph(id='daily_cases_by_country', figure={},  style={"max-width": "50%"}, config=graph_config)],
                 style={'display': 'flex'}),
 
             html.Div([
-                dcc.Graph(id='total_deaths_by_country', figure={}, style={"max-width": "50%"}),
-                dcc.Graph(id='daily_deaths_by_country', figure={}, style={"max-width": "50%"})
-            ],
-                style={'display': 'flex'}),
-        ], style={'width': '74%', 'float': 'right'}),
+                dcc.Graph(id='total_deaths_by_country', figure={},  style={"max-width": "50%"}, config=graph_config),
+                dcc.Graph(id='daily_deaths_by_country', figure={},  style={"max-width": "50%"}, config=graph_config)
+            ], style={'display': 'flex'})], style={'width': '74%', 'float': 'right'}),
 
         html.H2("Latest Covid-19 news around the world", className="news_main_header"),
 
         html.Div(id='news_location', style={"padding-bottom": "5%"}),
 
-        html.Div(id='dummy'),
         ])
 
 

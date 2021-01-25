@@ -22,7 +22,6 @@ app.layout = make_layout()
 server = app.server
 
 
-# TODO: add continent drill down countries
 @app.callback(
     Output(component_id='table_stats', component_property='data'),
     Input(component_id='date', component_property='date'),
@@ -66,14 +65,16 @@ def stats(date_selected):
     Output(component_id='graph', component_property='figure'),
     Input(component_id='today_btn', component_property='n_clicks'),
     Input(component_id='total_btn', component_property='n_clicks'),
-    Input(component_id='date', component_property='date')
+    Input(component_id='date', component_property='date'),
+    Input(component_id='card-tabs', component_property='active_tab'),
 )
-def world_graph(today_btn, total_btn, date_selected):
+def world_graph(today_btn, total_btn, date_selected, active_tab):
     """
     Updates the geo-scatter graph depending on date and whether the users want total/today stats
     :param today_btn: Button to select today's stats
     :param total_btn: Button to select total's stats
     :param date_selected: Date selected from calendar
+    :param active_tab: Tab selected when seeing comparison between continents
     :return: Updated the geo-scatter graph
     """
     changed_id = dash.callback_context.triggered[0]['prop_id']
@@ -84,9 +85,9 @@ def world_graph(today_btn, total_btn, date_selected):
     dff = df[(df['date'] == date_selected) & (df['continent'] != 0)]
 
     if stats_chosen == 'today':
-        stats_chosen = 'new_cases'
+        stats_chosen = 'new_' + active_tab
     else:
-        stats_chosen = 'total_cases'
+        stats_chosen = 'total_' + active_tab
 
     return geo_scatter_graph(dff, stats_chosen)
 
@@ -121,8 +122,10 @@ def drill_down_cases(date, today_btn, total_btn, drill_down):
         cases_by_continent = display_continent(stats_chosen, list_of_continent, "cases", "Total Cases", date)
         return cases_by_continent
 
-    if drill_down and drill_down['points'][0]['label'] in ['Asia', 'Europe', 'Africa', 'North America',
-                                                           'South America', 'Oceania']:
+    # and continent_click['points'][0]['label'] not in [
+    #         'Asia', 'Europe', 'Africa', 'North America', 'South America', 'Oceania']
+    if drill_down and drill_down['points'][0]['label'] in ['Asia', 'Europe', 'Africa', 'North America', 'South America', 'Oceania']:
+        print(drill_down)
         continent = drill_down['points'][0]['label']
         data = df[(df['date'] == date) & (df['continent'] == continent)]
         countries_list = data['location'].to_list()
@@ -202,15 +205,18 @@ def drill_down_vaccines(date, today_btn, total_btn, drill_down):
         return total_vaccines_by_country
 
 
-def get_top_stats(data, date_selected, col_name):
+def get_top_stats(data, date_selected, col_name, display_type):
     data = data[(data['date'] == date_selected) & (data['continent'] != 0)].sort_values(by=[col_name])[
         ['location', col_name]].tail(10)
     new_location_list = data['location'].to_list()[::-1]
     new_list = data[col_name].to_list()[::-1]
 
-    code = [html.U(col_name.replace('_', ' ').title())]
+    code = [html.U("Top " + col_name.replace('_', ' ').title())]
     for index, (location, number) in enumerate(zip(new_location_list, new_list)):
-        code.append(html.Div([html.Div(index+1, className="number_circle"), ' ', location, ': +', number]))
+        if display_type == 'New':
+            code.append(html.Div([html.Div(index+1, className="number_circle"), ' ', location, ': +', number]))
+        else:
+            code.append(html.Div([html.Div(index + 1, className="number_circle"), ' ', location, ': ', number]))
         code.append(html.Br())
     return code
 
@@ -220,14 +226,17 @@ def get_top_stats(data, date_selected, col_name):
     Input(component_id='date', component_property='date'),
 )
 def top_statistics(date_selected):
-    new_cases_location = get_top_stats(df, date_selected, 'new_cases')
+    new_cases_location = get_top_stats(df, date_selected, 'new_cases', 'New')
+    total_cases_location = get_top_stats(df, date_selected, 'total_cases', 'Total')
 
-    new_deaths_location = get_top_stats(df, date_selected, 'new_deaths')
+    new_deaths_location = get_top_stats(df, date_selected, 'new_deaths', 'New')
+    total_deaths_location = get_top_stats(df, date_selected, 'total_deaths', 'Total')
 
-    new_vaccines_location = get_top_stats(df, date_selected, 'new_vaccinations')
+    new_vaccines_location = get_top_stats(df, date_selected, 'new_vaccinations', 'New')
+    total_vaccines_location = get_top_stats(df, date_selected, 'total_vaccinations', 'Total')
 
-    new_cases_location.extend(new_deaths_location)
-    new_cases_location.extend(new_vaccines_location)
+    new_cases_location.extend(total_cases_location + new_deaths_location + total_deaths_location +
+                              new_vaccines_location + total_vaccines_location)
 
     return new_cases_location
 
@@ -239,9 +248,10 @@ def top_statistics(date_selected):
     Input(component_id='country_name_dropdown', component_property='value'),
     Input(component_id='table_stats', component_property='active_cell'),
     Input(component_id='graph', component_property='clickData'),
+    Input(component_id='total_cases_by_continent', component_property='clickData'),
     State(component_id='table_stats', component_property='data'),
 )
-def country_cases_stats(name_selected, active_cell, clickdata, data):
+def country_cases_stats(name_selected, active_cell, clickdata, continent_click, data):
     if active_cell:
         cell_data = data[active_cell['row']]
         country_data = df.loc[(df['iso_code'] == cell_data['iso_code']) & (df['date'] == cell_data['date'].
@@ -251,15 +261,22 @@ def country_cases_stats(name_selected, active_cell, clickdata, data):
     elif clickdata and dash.callback_context.triggered[0]['prop_id'] != 'country_name_dropdown.value':
         iso_code = clickdata['points'][0]['location']
         country_name = df[df['iso_code'] == iso_code]['location'].values[0]
+
+    elif continent_click and continent_click['points'][0]['label'] not in ['Asia', 'Europe', 'Africa', 'North America', 'South America', 'Oceania']:
+        country_name = continent_click['points'][0]['label']
+        print('COUNTRY NAME', country_name)
+
     else:
         country_name = name_selected
-
+    #
+    # if drill_down and drill_down['points'][0]['label'] in ['Asia', 'Europe', 'Africa', 'North America',
+    #                                                        'South America', 'Oceania']:
     country_name_df = df[df['location'] == country_name]
 
     total_cases_by_country = country_bar_graph(country_name_df, "total_cases", "Total Cases")
     daily_cases_by_country = country_bar_graph(country_name_df, "new_cases", "New Cases")
 
-    total_cases_by_country, daily_cases_by_country = full_country_graphs(total_cases_by_country, daily_cases_by_country)
+    total_cases_by_country, daily_cases_by_country = full_country_graphs(total_cases_by_country, daily_cases_by_country, "Cases", country_name)
 
     return total_cases_by_country, daily_cases_by_country, country_name
 
@@ -270,9 +287,10 @@ def country_cases_stats(name_selected, active_cell, clickdata, data):
     Input(component_id='country_name_dropdown', component_property='value'),
     Input(component_id='table_stats', component_property='active_cell'),
     Input(component_id='graph', component_property='clickData'),
+    Input(component_id='total_cases_by_continent', component_property='clickData'),
     State(component_id='table_stats', component_property='data'),
 )
-def country_deaths_stats(name_selected, active_cell, clickdata, data):
+def country_deaths_stats(name_selected, active_cell, clickdata, continent_click, data):
     if active_cell:
         cell_data = data[active_cell['row']]
         country_data = df.loc[(df['iso_code'] == cell_data['iso_code']) & (df['date'] == cell_data['date'].
@@ -282,6 +300,11 @@ def country_deaths_stats(name_selected, active_cell, clickdata, data):
     elif clickdata and dash.callback_context.triggered[0]['prop_id'] != 'country_name_dropdown.value':
         iso_code = clickdata['points'][0]['location']
         country_name = df[df['iso_code'] == iso_code]['location'].values[0]
+
+    elif continent_click and continent_click['points'][0]['label'] not in ['Asia', 'Europe', 'Africa', 'North America', 'South America', 'Oceania']:
+        country_name = continent_click['points'][0]['label']
+        print('COUNTRY NAME deaths', country_name)
+
     else:
         country_name = name_selected
 
@@ -291,7 +314,7 @@ def country_deaths_stats(name_selected, active_cell, clickdata, data):
     daily_deaths_by_country = country_bar_graph(country_name_df, "new_deaths", "New Deaths")
 
     total_deaths_by_country, daily_deaths_by_country = full_country_graphs(total_deaths_by_country,
-                                                                           daily_deaths_by_country)
+                                                                           daily_deaths_by_country, "Deaths", country_name)
 
     return total_deaths_by_country, daily_deaths_by_country
 
@@ -304,5 +327,5 @@ def update_output(date):
 
 
 if __name__ == '__main__':
-    # app.run_server(debug=True)
-    app.run_server(debug=False,  port=int(os.environ.get("PORT", 5000)), host='0.0.0.0')
+    app.run_server(debug=True)
+    # app.run_server(debug=False,  port=int(os.environ.get("PORT", 5000)), host='0.0.0.0')

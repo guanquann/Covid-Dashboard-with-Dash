@@ -83,6 +83,23 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     background-color: #F4E808;
 }
 
+.back_btn_drill_down {
+    border-radius: 8px;
+    border: 1px solid #F4E808;
+    color: #F4E808;
+}
+
+.back_btn_drill_down:hover {
+    border-radius: 8px;
+    border: 1px solid #EC7575;
+    background-color: #EC7575;
+}
+
+.back_btn_drill_down:focus {
+    border-radius: 8px;
+    border: 1px solid #F4E808;
+    background-color: #F4E808;
+}
 
 /*outline of tab*/
 .card {
@@ -98,6 +115,11 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     border-radius: 3px;
     border: 0.5px solid;
     font-weight: bold;
+}
+
+.graph_tabs {
+    width: 90%;
+    min-width: 300px;
 }
 
 .daily_stats_thumbnail {
@@ -159,7 +181,8 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
 }
 
 #table_stats {
-    margin: 3%;
+    margin-left: 3%;
+    margin-right: 3%;
     border: 2px black solid;
     -ms-overflow-style: none;  /* hide scrollbar for IE and Edge */
     scrollbar-width: none;  /* hide scrollbar for Firefox */
@@ -208,7 +231,7 @@ br {
 .news_main_header {
     color: white;
     text-align: center;
-    margin-top: 10%;
+    margin-top: 6%;
 }
 
 .newspaper_thumbnail {

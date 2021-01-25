@@ -60,7 +60,7 @@ def country_bar_graph(country_name, y_axis, graph_label):
                   {"location": "Country", "date": "Date", y_axis: graph_label})
 
 
-def full_country_graphs(total_by_country, daily_by_country):
+def full_country_graphs(total_by_country, daily_by_country, type_stats, country):
     for index, graph in enumerate([total_by_country, daily_by_country]):
         graph.update_layout(
             showlegend=False,
@@ -84,7 +84,10 @@ def full_country_graphs(total_by_country, daily_by_country):
         graph.update_yaxes(showline=True, linewidth=2, linecolor='#F4E808',
                            titlefont={"size": 13, "color": "#F4E808"}, ticks="inside", tickwidth=1,
                            tickcolor='#F4E808', ticklen=5)
-        graph.update_traces(marker_color='#F4E808', marker_line=dict(width=2, color='#F4E808'))
+        graph.update_traces(marker_color='#F4E808', marker_line=dict(width=2, color='#F4E808'),
+                            textposition='auto',
+                            hovertemplate='<b>' + country + '</b><br><br>' + type_stats + ': %{y:0f} <br>' + 'Date' + ': %{x}  <extra></extra>',
+                            )
 
     return total_by_country, daily_by_country
 
@@ -132,8 +135,8 @@ def display_continent(stats_chosen, list_of_continent, column_name, x_axis, date
         cases_by_continent = px.bar(graph_df, x=x_axis, y="Continent", color="Continent",
                                     text=x_axis, template="simple_white")
 
-    cases_by_continent.update_traces(texttemplate='%{text:.4s}', textposition='auto',
-                                     hovertemplate='Continent: %{y} <br>'+'Cases'+': %{x}  <extra></extra>', )
+    cases_by_continent.update_traces(textposition='auto',
+                                     hovertemplate='Continent: %{y} <br>'+'Cases'+': %{x:0f}  <extra></extra>', )
     cases_by_continent.update_layout(showlegend=False,
                                      paper_bgcolor="#010310",
                                      plot_bgcolor="#010310",
