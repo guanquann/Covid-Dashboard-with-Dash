@@ -41,6 +41,27 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     background-color: #EC7575;
 }
 
+.world_stats {
+    border-radius: 8px 0px 0px 8px;
+    border: 1px solid #F4E808;
+    color: #F4E808;
+    font-size: medium;
+    margin-left: 5%;
+    vertical-align: top;
+}
+
+.world_stats:hover {
+    border-radius: 8px 0px 0px 8px;
+    border: 1px solid #EC7575;
+    background-color: #EC7575;
+}
+
+.world_stats:focus {
+    border-radius: 8px 0px 0px 8px;
+    border: 1px solid #F4E808;
+    background-color: #F4E808;
+}
+
 .today_btn {
     border-radius: 8px 0px 0px 8px;
     border: 1px solid #F4E808;
@@ -83,22 +104,27 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     background-color: #F4E808;
 }
 
-.back_btn_drill_down {
+.toggle {
     border-radius: 8px;
     border: 1px solid #F4E808;
     color: #F4E808;
 }
 
-.back_btn_drill_down:hover {
+.toggle:hover {
     border-radius: 8px;
     border: 1px solid #EC7575;
     background-color: #EC7575;
 }
 
-.back_btn_drill_down:focus {
+.toggle:focus {
     border-radius: 8px;
     border: 1px solid #F4E808;
     background-color: #F4E808;
+}
+
+.cardBody {
+    background-color: #010310;
+    border-radius: 0;
 }
 
 /*outline of tab*/
@@ -158,26 +184,28 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
 }
 
 #country_name_dropdown .Select-value {
-    background-color: #F4E808;
+    background-color: #010310;
     color: #EC7575;  /*colour of contents inside dropdown when mouse over it */
-    /*font-size: 3vh;*/
+    font-size: 15px;
 }
 
-/*div of type of stats (daily/total stats) */
 #country_name_dropdown .Select-multi-value-wrapper {
-    width:60px;
-    max-width:15%;
-    /*height:5vh;*/
+    width:90px;
+    height:36.75px;
+    font-size: 15px;
 }
 
 /*colour of type of stats div*/
 #country_name_dropdown .VirtualizedSelectFocusedOption {
     background-color: #EC7575;
+    width:90px;
 }
 
 /*colour of div for dropdown if not option is selected*/
 .Select-control {
-    background-color: #EC7575;
+    background-color: #010310;
+    border-radius: 0px 8px 8px 0px;
+    border: 1px solid #F4E808;
 }
 
 #table_stats {

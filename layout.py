@@ -18,23 +18,27 @@ df, country_name_list, numdate = latest_covid_data(r'https://covid.ourworldindat
 
 df_cols = ['Country', 'Total Cases', 'New Cases', 'Total Deaths', 'New Deaths']
 
+# Tabs for the top right corner of the website
 tab1_content = dbc.Card(
     dbc.CardBody(
         [dcc.Graph(id='total_cases_by_continent', figure={}, className="graph_tabs", config=graph_config),
-         html.Button("Reset", id="drillback_cases", n_clicks=0, className="back_btn_drill_down")],
-        style={"background-color": colors['bg'], "border-radius": "0"}), outline=colors['bg'], className="mt-3")
+         html.Button("Confirm", id="toggle_cases", n_clicks=0, className="toggle"),
+         html.Div("Click on any continent before clicking Confirm", style={"display": "inline-block", "color": "#F4E808", "vertical-align": "bottom", "margin-left": "1.8%"})],
+        className="cardBody"), outline=colors['bg'], className="mt-3")
 
 tab2_content = dbc.Card(
     dbc.CardBody(
         [dcc.Graph(id='total_deaths_by_continent', figure={}, className="graph_tabs", config=graph_config),
-         html.Button("Reset", id="drillback_deaths", n_clicks=0, className="back_btn_drill_down")],
-        style={"background-color": colors['bg'], "border-radius": "0"}), outline=colors['bg'], className="mt-3")
+         html.Button("Confirm", id="toggle_deaths", n_clicks=0, className="toggle"),
+         html.Div("Click on any continent before clicking Confirm", style={"display": "inline-block", "color": "#F4E808"})],
+        className="cardBody"), outline=colors['bg'], className="mt-3")
 
 tab3_content = dbc.Card(
     dbc.CardBody(
         [dcc.Graph(id='total_vaccines_by_continent', figure={}, className="graph_tabs", config=graph_config),
-         html.Button("Reset", id="drillback_vaccines", n_clicks=0, className="back_btn_drill_down")],
-        style={"background-color": colors['bg'], "border-radius": "0"}), outline=colors['bg'], className="mt-3")
+         html.Button("Confirm", id="toggle_vaccines", n_clicks=0, className="toggle"),
+         html.Div("Click on any continent before clicking Confirm", style={"display": "inline-block", "color": "#F4E808"})],
+        className="cardBody"), outline=colors['bg'], className="mt-3")
 
 
 def make_layout():
@@ -56,11 +60,13 @@ def make_layout():
                                              date=str(df['date'].max().to_pydatetime()-timedelta(days=1)).split(' ')[0],
                                              style={'display': 'inline-block', 'vertical-align': 'top'}),
 
+                        html.Button("World", id='world_stats', n_clicks=0, className="world_stats"),
+
                         html.Div([dcc.Dropdown(
                             id='country_name_dropdown',
                             options=country_name_list,
                             value='World',
-                        )], style={'width': '10%', 'display': 'inline-block', 'margin-left': '3%'}),
+                        )], style={'width': '10%', 'display': 'inline-block'}),
 
                         html.Button("Today", id='today_btn', n_clicks=0, className="today_btn"),
                         html.Button("Total", id='total_btn', n_clicks=0, className="total_btn"),
@@ -75,7 +81,6 @@ def make_layout():
             html.Div(id='total_vaccines', className="daily_stats_thumbnail"),
         ], className="daily_stats_thumbnail_display"),
 
-        # html.Div(dcc.Graph(id='testing')),
         html.H2(id="country_name", style={"margin-left": "5%", "color": "#F4E808"}),
 
         html.Div([
@@ -100,8 +105,6 @@ def make_layout():
                     ),
                 ], style={"width": "50%", "background-color": "#010310", "display": "inline-block"}
             )], style={"display": "flex", "margin-top": "1%"}),
-
-        # html.Button("Reset", id="reset_btn", n_clicks=0),
 
         html.Div("Click the country name you are interested in to look at its graphs below!",
                  style={"color": "#F4E808", "font-size": "medium", "margin-left": "3%"}),
@@ -161,39 +164,3 @@ def make_layout():
         html.Div(id='news_location', style={"padding-bottom": "5%"}),
 
         ])
-
-
-def data_bars(df, column):
-    n_bins = 100
-    bounds = [i * (1.0 / n_bins) for i in range(n_bins + 1)]
-    ranges = [
-        ((df[column].max() - df[column].min()) * i) + df[column].min()
-        for i in bounds
-    ]
-    styles = []
-    for i in range(1, len(bounds)):
-        min_bound = ranges[i - 1]
-        max_bound = ranges[i]
-        max_bound_percentage = bounds[i] * 100
-        styles.append({
-            'if': {
-                'filter_query': (
-                    '{{{column}}} >= {min_bound}' +
-                    (' && {{{column}}} < {max_bound}' if (i < len(bounds) - 1) else '')
-                ).format(column=column, min_bound=min_bound, max_bound=max_bound),
-                'column_id': column
-            },
-            'background': (
-                """
-                    linear-gradient(90deg,
-                    #0074D9 0%,
-                    #0074D9 {max_bound_percentage}%,
-                    white {max_bound_percentage}%,
-                    white 100%)
-                """.format(max_bound_percentage=max_bound_percentage)
-            ),
-            'paddingBottom': 2,
-            'paddingTop': 2
-        })
-
-    return styles

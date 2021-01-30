@@ -6,6 +6,11 @@ from datetime import timedelta
 
 
 def latest_covid_data(csv_file):
+    """
+    Get the latest covid data from website
+    :param csv_file: link of html
+    :return: required df, all country names, minimum to maximum date
+    """
     df = pd.read_csv(csv_file)
 
     # Identify rows that have new/total cases/deaths less than 0, which is impossible
@@ -15,9 +20,6 @@ def latest_covid_data(csv_file):
     df = df[["iso_code", "continent", "location", "date", "total_cases", "new_cases", "total_deaths", "new_deaths",
              "total_cases_per_million", "new_cases_per_million", "total_deaths_per_million", "new_deaths_per_million",
              "population", "total_vaccinations", "new_vaccinations", "hosp_patients"]]
-
-    # Continent that are N.A. means total world statistics
-    # df = df[df['continent'].notna()]
 
     # Remove rows that are wrong value / empty
     df = df[df['date'].notna()]
@@ -30,7 +32,6 @@ def latest_covid_data(csv_file):
 
     # Convert column from string to date object
     df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
-    # group_continent = pd.read_csv('covid-data.csv')
 
     country_name_list = []
     for country_name in df['location'].unique():
@@ -43,6 +44,14 @@ def latest_covid_data(csv_file):
 
 
 def generate_thumbnail(news_title, description, news_url, news_image_url):
+    """
+    Generate thumbnail for news article
+    :param news_title: title of the news
+    :param description: description of the news
+    :param news_url: url of the news (href)
+    :param news_image_url: url of image of news
+    :return: thumbnail for news article
+    """
     return html.Div([
         html.Div([
             html.Img(src=news_image_url,
@@ -56,11 +65,15 @@ def generate_thumbnail(news_title, description, news_url, news_image_url):
 
 
 def latest_news(df):
+    """
+    Get the latest covid news using newsAPI
+    :param df: dataframe
+    :return: list of latest news
+    """
     all_news = set()
     url = ('http://newsapi.org/v2/everything?'
            'language=en&'
            'q=coronavirus&'
-           'q=covid-19&'
            'from={}&to={}&'
            'apiKey={}'.format(df['date'].max().to_pydatetime()-timedelta(days=3), df['date'].max(), os.getenv('API')))
     response = requests.get(url)
