@@ -165,10 +165,10 @@ def display_continent(stats_chosen, list_of_continent, column_name, x_axis, date
                                      margin=dict(l=0, r=0, t=0, b=0),
                                      height=350,
                                      )
-    cases_by_continent.add_annotation(text="DrillDown available",
-                                      font={"color": "#F4E808", "size": 9},
-                                      xref="paper", yref="paper",
-                                      x=0.95, y=0.0, showarrow=False)
+    # cases_by_continent.add_annotation(text="DrillDown available",
+    #                                   font={"color": "#F4E808", "size": 9},
+    #                                   xref="paper", yref="paper",
+    #                                   x=0.95, y=0.0, showarrow=False)
     # Colour of axes -> the straight line only
     cases_by_continent.update_xaxes(title_font=dict(color="#F4E808"))
     cases_by_continent.update_yaxes(title_font=dict(color="#F4E808"))
@@ -186,7 +186,7 @@ def drill_down_continent(graph_df, y_axis):
     total_by_country = px.bar(graph_df, x="Countries", y=y_axis, color="Countries",
                               template="simple_white",)
 
-    total_by_country.update_traces(hovertemplate='Country: %{x} <br>' + 'Cases' + ': %{y}  <extra></extra>')
+    total_by_country.update_traces(hovertemplate='Country: %{x} <br>' + 'Cases' + ': %{y:0f}  <extra></extra>')
     total_by_country.update_layout(showlegend=False,
                                    paper_bgcolor="#010310",
                                    plot_bgcolor="#010310",

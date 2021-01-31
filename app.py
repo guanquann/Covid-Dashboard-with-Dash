@@ -25,6 +25,19 @@ list_of_continents = ['Asia', 'Europe', 'Africa', 'North America', 'South Americ
 
 
 @app.callback(
+    Output(component_id='today_btn', component_property='className'),
+    Output(component_id='total_btn', component_property='className'),
+    Input(component_id='today_btn', component_property='n_clicks'),
+    Input(component_id='total_btn', component_property='n_clicks'),
+)
+def select_btn_style(today_btn, total_btn):
+    if dash.callback_context.triggered[0]['prop_id'] == 'today_btn.n_clicks':
+        return "today_btn_selected", "total_btn_not_selected"
+    else:
+        return "today_btn_not_selected", "total_btn_selected"
+
+
+@app.callback(
     Output(component_id='table_stats', component_property='data'),
     Input(component_id='date', component_property='date'),
     Input(component_id='country_name_dropdown', component_property='value'),
@@ -159,7 +172,10 @@ def world_graph(today_btn, total_btn, date_selected, active_tab):
 
 @app.callback(
     Output(component_id='total_cases_by_continent', component_property='figure'),
+    Output(component_id='tab_cases_instruction', component_property='children'),
+    Output(component_id='current_selected_cases', component_property='children'),
     Output(component_id='toggle_cases', component_property='children'),
+
     Input(component_id='date', component_property='date'),
     Input(component_id='today_btn', component_property='n_clicks'),
     Input(component_id='total_btn', component_property='n_clicks'),
@@ -188,9 +204,7 @@ def drill_down_cases(date, today_btn, total_btn, toggle_cases, drill_down):
         list_of_continent.remove(0)
         cases_by_continent = display_continent(stats_chosen, list_of_continent, "cases", "Total Cases", date)
 
-        button_display = 'Confirm'
-
-        return cases_by_continent, button_display
+        return cases_by_continent, "Click on any continent before clicking Confirm", 'Currently Selected: None', 'Confirm'
 
     if drill_down and drill_down['points'][0]['label'] in ['Asia', 'Europe', 'Africa', 'North America',
                                                            'South America', 'Oceania']:
@@ -201,6 +215,7 @@ def drill_down_cases(date, today_btn, total_btn, toggle_cases, drill_down):
 
     data = df[(df['date'] == date) & (df['continent'] == continent)]
     countries_list = data['location'].to_list()
+
     if stats_chosen == 'total':
         graph_df = pd.DataFrame({'Countries': countries_list, 'Total Cases': data['total_cases'].to_list()})
         cases_by_country = drill_down_continent(graph_df, "Total Cases")
@@ -209,18 +224,21 @@ def drill_down_cases(date, today_btn, total_btn, toggle_cases, drill_down):
         graph_df = pd.DataFrame({'Countries': countries_list, 'Today Cases': data['new_cases'].to_list()})
         cases_by_country = drill_down_continent(graph_df, "Today Cases")
 
-    button_display = 'Back'
-    return cases_by_country, button_display
+    return cases_by_country, 'Click on Back to reset', 'Continent Selected: {}'.format(continent), 'Back'
 
 
 @app.callback(
     Output(component_id='total_deaths_by_continent', component_property='figure'),
+    Output(component_id='tab_deaths_instruction', component_property='children'),
+    Output(component_id='current_selected_deaths', component_property='children'),
+    Output(component_id='toggle_deaths', component_property='children'),
     Input(component_id='date', component_property='date'),
     Input(component_id='today_btn', component_property='n_clicks'),
     Input(component_id='total_btn', component_property='n_clicks'),
+    Input(component_id='toggle_deaths', component_property='n_clicks'),
     Input('total_deaths_by_continent', 'clickData')
 )
-def drill_down_deaths(date, today_btn, total_btn, drill_down):
+def drill_down_deaths(date, today_btn, total_btn, toggle_deaths, drill_down):
     changed_id = dash.callback_context.triggered[0]['prop_id']
     if changed_id == 'total_btn.n_clicks':
         stats_chosen = 'total'
@@ -228,11 +246,11 @@ def drill_down_deaths(date, today_btn, total_btn, drill_down):
         stats_chosen = 'today'
 
     # When the graph is not selected -> when the web is being loaded, this fn will be called
-    if not drill_down:
+    if not drill_down or toggle_deaths % 2 == 1:
         list_of_continent = list(df['continent'].unique())
         list_of_continent.remove(0)
         deaths_by_continent = display_continent(stats_chosen, list_of_continent, "deaths", "Total Deaths", date)
-        return deaths_by_continent
+        return deaths_by_continent, "Click on any continent before clicking Confirm", 'Currently Selected: None', 'Confirm'
 
     if drill_down and drill_down['points'][0]['label'] in ['Asia', 'Europe', 'Africa', 'North America',
                                                            'South America', 'Oceania']:
@@ -249,17 +267,21 @@ def drill_down_deaths(date, today_btn, total_btn, drill_down):
     else:
         graph_df = pd.DataFrame({'Countries': countries_list, 'Today Deaths': data['new_deaths'].to_list()})
         today_deaths_by_country = drill_down_continent(graph_df, "Today Deaths")
-        return today_deaths_by_country
+        return today_deaths_by_country, 'Click on Back to reset', 'Continent Selected: {}'.format(continent), 'Back'
 
 
 @app.callback(
     Output(component_id='total_vaccines_by_continent', component_property='figure'),
+    Output(component_id='tab_vaccines_instruction', component_property='children'),
+    Output(component_id='current_selected_vaccines', component_property='children'),
+    Output(component_id='toggle_vaccines', component_property='children'),
     Input(component_id='date', component_property='date'),
     Input(component_id='today_btn', component_property='n_clicks'),
     Input(component_id='total_btn', component_property='n_clicks'),
+    Input(component_id='toggle_vaccines', component_property='n_clicks'),
     Input(component_id='total_vaccines_by_continent', component_property='clickData')
 )
-def drill_down_vaccines(date, today_btn, total_btn, drill_down):
+def drill_down_vaccines(date, today_btn, total_btn, toggle_vaccines, drill_down):
     changed_id = dash.callback_context.triggered[0]['prop_id']
     if changed_id == 'total_btn.n_clicks':
         stats_chosen = 'total'
@@ -267,12 +289,12 @@ def drill_down_vaccines(date, today_btn, total_btn, drill_down):
         stats_chosen = 'today'
 
     # When the graph is not selected -> when the web is being loaded, this fn will be called
-    if not drill_down:
+    if not drill_down or toggle_vaccines % 2 == 1:
         list_of_continent = list(df['continent'].unique())
         list_of_continent.remove(0)
         vaccines_by_continent = display_continent(stats_chosen, list_of_continent, "vaccinations",
                                                   "Total Vaccinations", date)
-        return vaccines_by_continent
+        return vaccines_by_continent, "Click on any continent before clicking Confirm", 'Currently Selected: None', 'Confirm'
 
     if drill_down and drill_down['points'][0]['label'] in ['Asia', 'Europe', 'Africa', 'North America',
                                                            'South America', 'Oceania']:
@@ -290,7 +312,7 @@ def drill_down_vaccines(date, today_btn, total_btn, drill_down):
     else:
         graph_df = pd.DataFrame({'Countries': countries_list, 'Today Vaccinations': data['new_vaccinations'].to_list()})
         today_vaccines_by_country = drill_down_continent(graph_df, "Today Vaccinations")
-        return today_vaccines_by_country
+        return today_vaccines_by_country, 'Click on Back to reset', 'Continent Selected: {}'.format(continent), 'Back'
 
 
 def get_top_stats(data, date_selected, col_name, display_type):
@@ -434,5 +456,5 @@ def update_output(date):
 
 
 if __name__ == '__main__':
-    # app.run_server(debug=True)
-    app.run_server(debug=False,  port=int(os.environ.get("PORT", 5000)), host='0.0.0.0')
+    app.run_server(debug=True)
+    # app.run_server(debug=False,  port=int(os.environ.get("PORT", 5000)), host='0.0.0.0')

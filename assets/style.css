@@ -25,15 +25,12 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
 #type_of_stats .Select-value {
     background-color: #F4E808;
     color: #EC7575;  /*colour of contents inside dropdown when mouse over it */
-    /*font-size: 2.5vh;*/
 }
 
 /*div of type of stats (daily/total stats) */
 #type_of_stats .Select-multi-value-wrapper {
-    /*margin-right: 2%;*/
     width:180px;
     max-width:15%;
-    /*height:5vh;*/
 }
 
 /*colour of type of stats div*/
@@ -62,7 +59,29 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     background-color: #F4E808;
 }
 
-.today_btn {
+.today_btn_selected {
+    border-radius: 8px 0px 0px 8px;
+    border: 1px solid #F4E808;
+    color: #010310;
+    font-size: medium;
+    margin-left: 5%;
+    vertical-align: top;
+    background-color: #F4E808;
+}
+
+.today_btn_selected:hover {
+    border-radius: 8px 0px 0px 8px;
+    border: 1px solid #EC7575;
+    background-color: #EC7575;
+}
+
+.today_btn_selected:focus {
+    border-radius: 8px 0px 0px 8px;
+    border: 1px solid #F4E808;
+    background-color: #F4E808;
+}
+
+.today_btn_not_selected {
     border-radius: 8px 0px 0px 8px;
     border: 1px solid #F4E808;
     color: #F4E808;
@@ -71,20 +90,41 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     vertical-align: top;
 }
 
-.today_btn:hover {
+.today_btn_not_selected:hover {
     border-radius: 8px 0px 0px 8px;
     border: 1px solid #EC7575;
     background-color: #EC7575;
 }
 
-.today_btn:focus {
+.today_btn_not_selected:focus {
     border-radius: 8px 0px 0px 8px;
     border: 1px solid #F4E808;
     background-color: #F4E808;
 }
 
 
-.total_btn {
+.total_btn_selected {
+    border-radius: 0px 8px 8px 0px;
+    border: 1px solid #F4E808;
+    color: #010310;
+    font-size: medium;
+    vertical-align: top;
+    background-color: #F4E808;
+}
+
+.total_btn_selected:hover {
+    border-radius: 0px 8px 8px 0px;
+    border: 1px solid #EC7575;
+    background-color: #EC7575;
+}
+
+.total_btn_selected:focus {
+    border-radius: 0px 8px 8px 0px;
+    border: 1px solid #F4E808;
+    background-color: #F4E808;
+}
+
+.total_btn_not_selected {
     border-radius: 0px 8px 8px 0px;
     border: 1px solid #F4E808;
     color: #F4E808;
@@ -92,13 +132,13 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     vertical-align: top;
 }
 
-.total_btn:hover {
+.total_btn_not_selected:hover {
     border-radius: 0px 8px 8px 0px;
     border: 1px solid #EC7575;
     background-color: #EC7575;
 }
 
-.total_btn:focus {
+.total_btn_not_selected:focus {
     border-radius: 0px 8px 8px 0px;
     border: 1px solid #F4E808;
     background-color: #F4E808;
@@ -146,6 +186,13 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
 .graph_tabs {
     width: 90%;
     min-width: 300px;
+}
+
+.tab_instruction {
+    display: inline-block;
+    color: #F4E808;
+    vertical-align: bottom;
+    margin-left: 1.8%;
 }
 
 .daily_stats_thumbnail {
@@ -237,17 +284,20 @@ br {
   font-size: 24%;
 }
 
-.trending_stats {
+.trending_stats_section {
     display: inline-block;
+    margin-left: 2%;
+    width: 23%;
     color: #F4E808;
     font-size: medium;
-    margin-left: 2%;
+}
+
+.trending_stats {
     padding-left: 7px;
     border: 1px solid #F4E808;
     border-radius: 10px;
     height: 640px;
     overflow-y: auto;
-    width: 23%;
     -ms-overflow-style: none;  /* hide scrollbar for IE and Edge */
     scrollbar-width: none;  /* hide scrollbar for Firefox */
 }

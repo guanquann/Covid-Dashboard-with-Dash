@@ -14,7 +14,7 @@ graph_config = {'displayModeBar': True, 'displaylogo': False, 'modeBarButtonsToR
                  'toggleSpikelines', 'hoverClosestGeo']}
 
 # df = pd.read_csv(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
-df, country_name_list, numdate = latest_covid_data(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
+df, country_name_list, numdate = latest_covid_data(r'owid-covid-data.csv')
 
 df_cols = ['Country', 'Total Cases', 'New Cases', 'Total Deaths', 'New Deaths']
 
@@ -23,21 +23,24 @@ tab1_content = dbc.Card(
     dbc.CardBody(
         [dcc.Graph(id='total_cases_by_continent', figure={}, className="graph_tabs", config=graph_config),
          html.Button("Confirm", id="toggle_cases", n_clicks=0, className="toggle"),
-         html.Div("Click on any continent before clicking Confirm", style={"display": "inline-block", "color": "#F4E808", "vertical-align": "bottom", "margin-left": "1.8%"})],
+         html.Div([html.Div("Click on any continent before clicking Confirm", id="tab_cases_instruction"),
+                   html.Div("Continent Selected: None", id="current_selected_cases")], className="tab_instruction")],
         className="cardBody"), outline=colors['bg'], className="mt-3")
 
 tab2_content = dbc.Card(
     dbc.CardBody(
         [dcc.Graph(id='total_deaths_by_continent', figure={}, className="graph_tabs", config=graph_config),
          html.Button("Confirm", id="toggle_deaths", n_clicks=0, className="toggle"),
-         html.Div("Click on any continent before clicking Confirm", style={"display": "inline-block", "color": "#F4E808"})],
+         html.Div([html.Div("Click on any continent before clicking Confirm", id="tab_deaths_instruction"),
+                   html.Div("Continent Selected: None", id="current_selected_deaths")], className="tab_instruction")],
         className="cardBody"), outline=colors['bg'], className="mt-3")
 
 tab3_content = dbc.Card(
     dbc.CardBody(
         [dcc.Graph(id='total_vaccines_by_continent', figure={}, className="graph_tabs", config=graph_config),
          html.Button("Confirm", id="toggle_vaccines", n_clicks=0, className="toggle"),
-         html.Div("Click on any continent before clicking Confirm", style={"display": "inline-block", "color": "#F4E808"})],
+         html.Div([html.Div("Click on any continent before clicking Confirm", id="tab_vaccines_instruction"),
+                   html.Div("Continent Selected: None", id="current_selected_vaccines")], className="tab_instruction")],
         className="cardBody"), outline=colors['bg'], className="mt-3")
 
 
@@ -68,12 +71,9 @@ def make_layout():
                             value='World',
                         )], style={'width': '10%', 'display': 'inline-block'}),
 
-                        html.Button("Today", id='today_btn', n_clicks=0, className="today_btn"),
-                        html.Button("Total", id='total_btn', n_clicks=0, className="total_btn"),
-                  ],
-                        style={'width': '80%', "margin-left": "3%"}),
-
-                  ]),
+                        html.Button("Today", id='today_btn', n_clicks=0, className="today_btn_selected"),
+                        html.Button("Total", id='total_btn', n_clicks=0, className="total_btn_not_selected"),
+                  ], style={'width': '80%', "margin-left": "3%"})]),
 
         html.Div([
             html.Div(id='total_cases', className="daily_stats_thumbnail"),
@@ -89,6 +89,7 @@ def make_layout():
 
             dbc.Card(
                 [
+                    html.Div("Click on the Tabs to change the Geo-Scatter Graph on the left!", style={"color": "#F4E808"}),
                     dbc.Tabs(
                         [
                             dbc.Tab(tab1_content, label="CASES", tab_id="cases",
@@ -144,9 +145,10 @@ def make_layout():
             },
             # Remove vertical lines
             style_as_list_view=True,
-            sort_action="native",)]),
+            sort_action="native")], style={"margin-bottom": "5%"}),
 
-        html.Div(id="top_stats", className="trending_stats"),
+        html.Div([html.Div("Scroll Down to see more"),
+                  html.Div(id="top_stats", className="trending_stats")], className="trending_stats_section"),
 
         html.Div([
             html.Div([
