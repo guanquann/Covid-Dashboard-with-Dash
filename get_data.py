@@ -39,7 +39,6 @@ def latest_covid_data(csv_file):
 
     # transform every unique date to a number
     numdate = [x for x in range(0, len(df['date'].unique()) + 30, 30)]
-
     return df, country_name_list, numdate
 
 

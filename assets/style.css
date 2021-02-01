@@ -41,10 +41,11 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
 .world_stats {
     border-radius: 8px 0px 0px 8px;
     border: 1px solid #F4E808;
-    color: #F4E808;
+    color: #010310;
+    background-color: #F4E808;
     font-size: medium;
-    margin-left: 5%;
-    vertical-align: top;
+    margin-left: 2.5%;
+    vertical-align: bottom;
 }
 
 .world_stats:hover {
@@ -59,12 +60,33 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     background-color: #F4E808;
 }
 
+.world_stats_not_selected {
+    border-radius: 8px 0px 0px 8px;
+    border: 1px solid #F4E808;
+    color: #F4E808;
+    font-size: medium;
+    margin-left: 2.5%;
+    vertical-align: bottom;
+}
+
+.world_stats_not_selected:hover {
+    border-radius: 8px 0px 0px 8px;
+    border: 1px solid #EC7575;
+    background-color: #EC7575;
+}
+
+.world_stats_not_selected:focus {
+    border-radius: 8px 0px 0px 8px;
+    border: 1px solid #F4E808;
+    background-color: #F4E808;
+}
+
 .today_btn_selected {
     border-radius: 8px 0px 0px 8px;
     border: 1px solid #F4E808;
     color: #010310;
     font-size: medium;
-    margin-left: 5%;
+    margin-left: 12%;
     vertical-align: top;
     background-color: #F4E808;
 }
@@ -86,7 +108,7 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     border: 1px solid #F4E808;
     color: #F4E808;
     font-size: medium;
-    margin-left: 5%;
+    margin-left: 12%;
     vertical-align: top;
 }
 
@@ -232,20 +254,34 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
 
 #country_name_dropdown .Select-value {
     background-color: #010310;
-    color: #EC7575;  /*colour of contents inside dropdown when mouse over it */
+    color: #F4E808;
     font-size: 15px;
 }
 
 #country_name_dropdown .Select-multi-value-wrapper {
-    width:90px;
+    width:130px;
     height:36.75px;
     font-size: 15px;
+    color: #EC7575;
+    background-color: #010310;
 }
 
-/*colour of type of stats div*/
+/*colour of contents inside country name dropdown */
 #country_name_dropdown .VirtualizedSelectFocusedOption {
     background-color: #EC7575;
-    width:90px;
+    width: 130px;
+}
+
+.Select.has-value.Select--single > .Select-control .Select-value .Select-value-label, .Select.has-value.is-pseudo-focused.Select--single > .Select-control .Select-value .Select-value-label {
+    color: #F4E808;
+}
+
+.Select-clear-zone {
+    background-color: #010310;
+}
+
+.Select-arrow-zone {
+    background-color: #010310;
 }
 
 /*colour of div for dropdown if not option is selected*/
@@ -253,6 +289,7 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     background-color: #010310;
     border-radius: 0px 8px 8px 0px;
     border: 1px solid #F4E808;
+    width: 130px;
 }
 
 #table_stats {
