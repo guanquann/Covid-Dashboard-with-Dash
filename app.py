@@ -1,6 +1,5 @@
 import dash
 from dash.dependencies import Input, Output, State
-from dash.exceptions import PreventUpdate
 import time
 
 from callbacks import *
@@ -240,8 +239,7 @@ def drill_down_cases(date, today_btn, total_btn, toggle_cases, drill_down):
         list_of_continent.remove(0)
         cases_by_continent = display_continent(stats_chosen, list_of_continent, "cases", "Total Cases", date)
 
-        return cases_by_continent, "Click on any continent before clicking Confirm", \
-               'Currently Selected: None', 'Confirm'
+        return cases_by_continent, "Click on any continent before clicking Confirm", "Currently Selected: None", "Confirm"
 
     if drill_down and drill_down['points'][0]['label'] in ['Asia', 'Europe', 'Africa', 'North America',
                                                            'South America', 'Oceania']:
@@ -261,7 +259,8 @@ def drill_down_cases(date, today_btn, total_btn, toggle_cases, drill_down):
         graph_df = pd.DataFrame({'Countries': countries_list, 'Today Cases': data['new_cases'].to_list()})
         cases_by_country = drill_down_continent(graph_df, "Today Cases")
 
-    return cases_by_country, 'Click on Back to reset', 'Continent Selected: {}'.format(continent), 'Back'
+    return cases_by_country, "Click on Back to reset/Click on country's graph to view its graph below.", \
+           'Continent Selected: {}'.format(continent), 'Back'
 
 
 @app.callback(
@@ -276,6 +275,15 @@ def drill_down_cases(date, today_btn, total_btn, toggle_cases, drill_down):
     Input('total_deaths_by_continent', 'clickData')
 )
 def drill_down_deaths(date, today_btn, total_btn, toggle_deaths, drill_down):
+    """
+    Drill down number of deaths from continent to countries level
+    :param date: Date selected from calendar
+    :param today_btn: Button to select today's stats
+    :param total_btn: Button to select total's stats
+    :param toggle_deaths: Click on country to drill back to continent level
+    :param drill_down: Click on the graph to result in drill down
+    :return:
+    """
     changed_id = dash.callback_context.triggered[0]['prop_id']
     if changed_id == 'total_btn.n_clicks':
         stats_chosen = 'total'
@@ -287,8 +295,7 @@ def drill_down_deaths(date, today_btn, total_btn, toggle_deaths, drill_down):
         list_of_continent = list(df['continent'].unique())
         list_of_continent.remove(0)
         deaths_by_continent = display_continent(stats_chosen, list_of_continent, "deaths", "Total Deaths", date)
-        return deaths_by_continent, "Click on any continent before clicking Confirm", \
-               'Currently Selected: None', 'Confirm'
+        return deaths_by_continent, "Click on any continent before clicking Confirm", 'Currently Selected: None', 'Confirm'
 
     if drill_down and drill_down['points'][0]['label'] in ['Asia', 'Europe', 'Africa', 'North America',
                                                            'South America', 'Oceania']:
@@ -305,7 +312,8 @@ def drill_down_deaths(date, today_btn, total_btn, toggle_deaths, drill_down):
     else:
         graph_df = pd.DataFrame({'Countries': countries_list, 'Today Deaths': data['new_deaths'].to_list()})
         today_deaths_by_country = drill_down_continent(graph_df, "Today Deaths")
-        return today_deaths_by_country, 'Click on Back to reset', 'Continent Selected: {}'.format(continent), 'Back'
+        return today_deaths_by_country, "Click on Back to reset/Click on country's graph to view its graph below.", \
+               'Continent Selected: {}'.format(continent), 'Back'
 
 
 @app.callback(
@@ -320,6 +328,15 @@ def drill_down_deaths(date, today_btn, total_btn, toggle_deaths, drill_down):
     Input(component_id='total_vaccines_by_continent', component_property='clickData')
 )
 def drill_down_vaccines(date, today_btn, total_btn, toggle_vaccines, drill_down):
+    """
+    Drill down number of vaccines from continent to countries level
+    :param date: Date selected from calendar
+    :param today_btn: Button to select today's stats
+    :param total_btn: Button to select total's stats
+    :param toggle_vaccines: Click on country to drill back to continent level
+    :param drill_down: Click on the graph to result in drill down
+    :return:
+    """
     changed_id = dash.callback_context.triggered[0]['prop_id']
     if changed_id == 'total_btn.n_clicks':
         stats_chosen = 'total'
@@ -332,8 +349,7 @@ def drill_down_vaccines(date, today_btn, total_btn, toggle_vaccines, drill_down)
         list_of_continent.remove(0)
         vaccines_by_continent = display_continent(stats_chosen, list_of_continent, "vaccinations",
                                                   "Total Vaccinations", date)
-        return vaccines_by_continent, "Click on any continent before clicking Confirm", \
-               'Currently Selected: None', 'Confirm'
+        return vaccines_by_continent, "Click on any continent before clicking Confirm", 'Currently Selected: None', 'Confirm'
 
     if drill_down and drill_down['points'][0]['label'] in ['Asia', 'Europe', 'Africa', 'North America',
                                                            'South America', 'Oceania']:
@@ -352,10 +368,19 @@ def drill_down_vaccines(date, today_btn, total_btn, toggle_vaccines, drill_down)
     else:
         graph_df = pd.DataFrame({'Countries': countries_list, 'Today Vaccinations': data['new_vaccinations'].to_list()})
         today_vaccines_by_country = drill_down_continent(graph_df, "Today Vaccinations")
-        return today_vaccines_by_country, 'Click on Back to reset', 'Continent Selected: {}'.format(continent), 'Back'
+        return today_vaccines_by_country, "Click on Back to reset/Click on country's graph to view its graph below.", \
+               'Continent Selected: {}'.format(continent), 'Back'
 
 
 def get_top_stats(data, date_selected, col_name, display_type):
+    """
+    Get top 10 countries for total/daily cases/deaths/vaccines
+    :param data: Dataframe
+    :param date_selected: Date selected from calendar
+    :param col_name: daily_cases/daily_deaths/daily_vaccinations/total_cases/total_deaths/total_vaccinations
+    :param display_type: Display stats according to whether the statistics are from total/daily section
+    :return: Display top countries statistics
+    """
     data = data[(data['date'] == date_selected) & (data['continent'] != 0)].sort_values(by=[col_name])[
         ['location', col_name]].tail(10)
     new_location_list = data['location'].to_list()[::-1]
@@ -376,6 +401,11 @@ def get_top_stats(data, date_selected, col_name, display_type):
     Input(component_id='date', component_property='date'),
 )
 def top_statistics(date_selected):
+    """
+    Create the div to store all the top countries statistics
+    :param date_selected: Date selected from calendar
+    :return: div
+    """
     new_cases_location = get_top_stats(df, date_selected, 'new_cases', 'New')
     total_cases_location = get_top_stats(df, date_selected, 'total_cases', 'Total')
 
@@ -406,6 +436,18 @@ def top_statistics(date_selected):
 )
 def country_cases_stats(world_btn, name_selected, active_cell, graph_click, cases_click, deaths_click,
                         vaccines_click, data):
+    """
+    Generate cases graphs of a specific country at the bottom of the web due to different conditions
+    :param world_btn: When users click on the world button
+    :param name_selected: When users select a country from the dropdown
+    :param active_cell: When users click on a DataTable row
+    :param graph_click: When users click on a bubble in the GeoScatter graph
+    :param cases_click: When users click on a country's/continent's cases inside the tab
+    :param deaths_click: When users click on a country's/continent's deaths inside the tab
+    :param vaccines_click: When users click on a country's/continent's vaccines inside the tab
+    :param data: To get the information from the DataTable that is clicked by the user
+    :return: cases graphs of a specific country created on the bottom of the web
+    """
     if dash.callback_context.triggered[0]['prop_id'] == 'world_stats.n_clicks':
         country_name = 'World'
 
@@ -426,8 +468,6 @@ def country_cases_stats(world_btn, name_selected, active_cell, graph_click, case
     elif deaths_click and deaths_click['points'][0]['label'] not in list_of_continents and \
             dash.callback_context.triggered[0]['prop_id'] == 'total_deaths_by_continent.clickData':
         country_name = deaths_click['points'][0]['label']
-
-    # TODO: click on continent, show contientn graph
 
     elif vaccines_click and vaccines_click['points'][0]['label'] not in list_of_continents and \
             dash.callback_context.triggered[0]['prop_id'] == 'total_vaccines_by_continent.clickData':
@@ -450,27 +490,53 @@ def country_cases_stats(world_btn, name_selected, active_cell, graph_click, case
 @app.callback(
     Output(component_id='total_deaths_by_country', component_property='figure'),
     Output(component_id='daily_deaths_by_country', component_property='figure'),
+    Input(component_id='world_stats', component_property='n_clicks'),
     Input(component_id='country_name_dropdown', component_property='value'),
     Input(component_id='table_stats', component_property='active_cell'),
     Input(component_id='graph', component_property='clickData'),
     Input(component_id='total_cases_by_continent', component_property='clickData'),
+    Input(component_id='total_deaths_by_continent', component_property='clickData'),
+    Input(component_id='total_vaccines_by_continent', component_property='clickData'),
     State(component_id='table_stats', component_property='data'),
 )
-def country_deaths_stats(name_selected, active_cell, clickdata, continent_click, data):
-    if active_cell:
+def country_deaths_stats(world_btn, name_selected, active_cell, graph_click, cases_click, deaths_click,
+                         vaccines_click, data):
+    """
+    Generate cases graphs of a specific country at the bottom of the web due to different conditions
+    :param world_btn: When users click on the world button
+    :param name_selected: Date selected from the calendar
+    :param active_cell: When users click on a DataTable row
+    :param graph_click: When users click on a bubble in the GeoScatter graph
+    :param cases_click: When users click on a country's/continent's cases inside the tab
+    :param deaths_click: When users click on a country's/continent's deaths inside the tab
+    :param vaccines_click: When users click on a country's/continent's vaccines inside the tab
+    :param data: To get the information from the DataTable that is clicked by the user
+    :return: deaths graphs of a specific country created on the bottom of the web
+    """
+    if dash.callback_context.triggered[0]['prop_id'] == 'world_stats.n_clicks':
+        country_name = 'World'
+
+    elif active_cell:
         cell_data = data[active_cell['row']]
         country_data = df.loc[(df['iso_code'] == cell_data['iso_code']) & (df['date'] == cell_data['date'].
                                                                            split('T')[0])]
         country_name = country_data['location'].to_string().split('    ')[1]
 
-    # Determining which Input has fired using dash.callback_context.triggered
-    elif clickdata and dash.callback_context.triggered[0]['prop_id'] != 'country_name_dropdown.value':
-        iso_code = clickdata['points'][0]['location']
+    elif graph_click and dash.callback_context.triggered[0]['prop_id'] == 'graph.clickData':
+        iso_code = graph_click['points'][0]['location']
         country_name = df[df['iso_code'] == iso_code]['location'].values[0]
 
-    elif continent_click and continent_click['points'][0]['label'] not in ['Asia', 'Europe', 'Africa', 'North America',
-                                                                           'South America', 'Oceania']:
-        country_name = continent_click['points'][0]['label']
+    elif cases_click and cases_click['points'][0]['label'] not in list_of_continents and \
+            dash.callback_context.triggered[0]['prop_id'] == 'total_cases_by_continent.clickData':
+        country_name = cases_click['points'][0]['label']
+
+    elif deaths_click and deaths_click['points'][0]['label'] not in list_of_continents and \
+            dash.callback_context.triggered[0]['prop_id'] == 'total_deaths_by_continent.clickData':
+        country_name = deaths_click['points'][0]['label']
+
+    elif vaccines_click and vaccines_click['points'][0]['label'] not in list_of_continents and \
+            dash.callback_context.triggered[0]['prop_id'] == 'total_vaccines_by_continent.clickData':
+        country_name = vaccines_click['points'][0]['label']
 
     else:
         country_name = name_selected
@@ -483,7 +549,6 @@ def country_deaths_stats(name_selected, active_cell, clickdata, continent_click,
     total_deaths_by_country, daily_deaths_by_country = full_country_graphs(total_deaths_by_country,
                                                                            daily_deaths_by_country,
                                                                            "Deaths", country_name)
-
     return total_deaths_by_country, daily_deaths_by_country
 
 
@@ -495,5 +560,5 @@ def update_output(date):
 
 
 if __name__ == '__main__':
-    # app.run_server(debug=True)
-    app.run_server(debug=False,  port=int(os.environ.get("PORT", 5000)), host='0.0.0.0')
+    app.run_server(debug=True)
+    # app.run_server(debug=False,  port=int(os.environ.get("PORT", 5000)), host='0.0.0.0')

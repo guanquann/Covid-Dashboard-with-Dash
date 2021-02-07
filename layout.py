@@ -14,7 +14,7 @@ graph_config = {'displayModeBar': True, 'displaylogo': False, 'modeBarButtonsToR
                  'toggleSpikelines', 'hoverClosestGeo']}
 
 # df = pd.read_csv(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
-df, country_name_list, numdate = latest_covid_data(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
+df, country_name_list, numdate = latest_covid_data(r'owid-covid-data.csv')
 
 df_cols = ['Country', 'Total Cases', 'New Cases', 'Total Deaths', 'New Deaths']
 
@@ -63,13 +63,6 @@ def make_layout():
                                              date=str(df['date'].max().to_pydatetime()-timedelta(days=1)).split(' ')[0],
                                              style={'display': 'inline-block', 'vertical-align': 'top'}),
 
-                        # html.Button("World", id='world_stats', n_clicks=0, className="world_stats"),
-                        # html.Div([dcc.Dropdown(
-                        #     id='country_name_dropdown',
-                        #     options=country_name_list,
-                        #     value='World',
-                        # )], style={'width': '10%', 'display': 'inline-block'}),
-
                         html.Button("Today", id='today_btn', n_clicks=0, className="today_btn_selected"),
                         html.Button("Total", id='total_btn', n_clicks=0, className="total_btn_not_selected"),
                   ], style={'width': '80%', "margin-left": "3%"})]),
@@ -106,7 +99,7 @@ def make_layout():
             )], style={"display": "flex", "margin-top": "1%"}),
 
         html.Div([
-            html.H2(id="country_name", style={"margin-left": "3%", "color": "#F4E808", "display": "inline-block"}),
+            html.H2(id="country_name"),
             html.Button("World", id='world_stats', n_clicks=0, className="world_stats"),
             html.Div([dcc.Dropdown(
                 id='country_name_dropdown',
@@ -116,10 +109,9 @@ def make_layout():
         ]),
 
         html.Div("Select the country name you are interested in to look at its graphs below!",
-                 style={"color": "#F4E808", "font-size": "medium", "margin-left": "3%"}),
+                 className="table_instructions_med"),
 
-        html.Div("Click the World button above to reset the Tabel!",
-                 style={"color": "#F4E808", "font-size": "small", "margin-left": "3%"}),
+        html.Div("Click the World button above to reset the Table!", className="table_instructions_small"),
 
         html.Div([dash_table.DataTable(
             id="table_stats",

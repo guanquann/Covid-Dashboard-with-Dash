@@ -292,6 +292,25 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     width: 130px;
 }
 
+#country_name {
+    display: inline-block;
+    vertical-align: bottom;
+    margin-left: 3%;
+    color: #F4E808;
+}
+
+.table_instructions_small {
+    color: #F4E808;
+    font-size: small;
+    margin-left: 3%;
+}
+
+.table_instructions_med {
+    color: #F4E808;
+    font-size: medium;
+    margin-left: 3%;
+}
+
 #table_stats {
     margin-left: 3%;
     margin-right: 3%;

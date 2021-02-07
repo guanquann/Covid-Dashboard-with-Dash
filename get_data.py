@@ -28,16 +28,16 @@ def latest_covid_data(csv_file):
 
     # Replace all N.A. with 0 for easy manipulation of data
     df.fillna(0, inplace=True)
-    # df.to_csv('covid-data.csv')
 
     # Convert column from string to date object
     df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
 
+    # Get all the country names in a list
     country_name_list = []
     for country_name in df['location'].unique():
         country_name_list.append({'label': country_name, 'value': country_name})
 
-    # transform every unique date to a number
+    # Transform every unique date to a number
     numdate = [x for x in range(0, len(df['date'].unique()) + 30, 30)]
     return df, country_name_list, numdate
 
