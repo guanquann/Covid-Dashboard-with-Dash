@@ -14,7 +14,7 @@ graph_config = {'displayModeBar': True, 'displaylogo': False, 'modeBarButtonsToR
                  'toggleSpikelines', 'hoverClosestGeo']}
 
 # df = pd.read_csv(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
-df, country_name_list, numdate = latest_covid_data(r'owid-covid-data.csv')
+df, country_name_list, numdate = latest_covid_data(r'https://covid.ourworldindata.org/data/owid-covid-data.csv')
 
 df_cols = ['Country', 'Total Cases', 'New Cases', 'Total Deaths', 'New Deaths']
 
