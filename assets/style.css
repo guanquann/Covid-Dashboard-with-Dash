@@ -86,7 +86,7 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     border: 1px solid #F4E808;
     color: #010310;
     font-size: medium;
-    margin-left: 12%;
+    margin-left: 5%;
     vertical-align: top;
     background-color: #F4E808;
 }
@@ -233,6 +233,7 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-top: 3%
 }
 
 .daily_stats_thumbnail_inner_div {
@@ -260,10 +261,11 @@ input[type=email], input[type=number], input[type=search], input[type=text], inp
 
 #country_name_dropdown .Select-multi-value-wrapper {
     width:130px;
-    height:36.75px;
+    height:36.665px;
     font-size: 15px;
     color: #EC7575;
     background-color: #010310;
+    vertical-align: bottom;
 }
 
 /*colour of contents inside country name dropdown */

@@ -55,10 +55,10 @@ def select_country_style(world_stats_btn, country_name_dropdown):
     :param country_name_dropdown: when clicked, specific country stats would be displayed
     :return: class name of world_stats_btn
     """
-    if dash.callback_context.triggered[0]['prop_id'] == 'world_stats.n_clicks':
-        return "world_stats"
-    else:
+    if dash.callback_context.triggered[0]['prop_id'] == 'country_name_dropdown.value':
         return "world_stats_not_selected"
+    else:
+        return "world_stats"
 
 
 @app.callback(
